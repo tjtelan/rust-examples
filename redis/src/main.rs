@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+extern crate dotenv;
 extern crate redis;
 use redis::{Connection,Commands,RedisResult};
 
@@ -38,6 +39,9 @@ fn fetch_an_integer(redis_connection : &Connection) -> RedisResult<isize> {
 }
 
 fn main() {
+    // Load env vars from .env file, if exists
+    dotenv::dotenv();
+
     let con = connect_to_redis();
     set_an_integer(&con, 42);
     println!("{:?}", fetch_an_integer(&con));
