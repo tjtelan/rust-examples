@@ -1,5 +1,14 @@
-# To get compiling on MacOS, you need to install openssl, and set these environment vars
-brew install openssl@1.1
-export OPENSSL_ROOT_DIR=$(brew --prefix openssl)
-export OPENSSL_LIB_DIR=$(brew --prefix openssl)"/lib"
-export OPENSSL_INCLUDE_DIR=$(brew --prefix openssl)"/include"
+Currently the rust Vault library, `hashicorp_vault`, only supports Vault's kv backend version 1.
+
+By default, the docker-compose will start a server using kv backend version 2.
+
+These are the commands to start Vault, and reconfigure the backend to use version 1:
+
+```
+docker-compose up -d
+export VAULT_ADDR=http://localhost:8200
+export VAULT_TOKEN=test
+vault secrets disable secret/
+vault secrets enable -version=1 -path=secret kv
+
+```
