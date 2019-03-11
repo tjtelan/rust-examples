@@ -1,0 +1,27 @@
+[package]
+name = "grpc-example"
+version = "0.1.0"
+authors = ["T.J. Telan <t.telan@gmail.com>"]
+edition = "2018"
+
+[lib]
+name = "protos"
+path = "src/protos/mod.rs"
+
+[[bin]]
+name = "server"
+path = "src/server.rs"
+
+[[bin]]
+name = "client"
+path = "src/client.rs"
+
+[dependencies]
+futures = "0.1.16"
+# Disabling secure until I can document how to configure host environment for building with secure enabled.
+#grpcio = { version = "0.4.3", features = [ "secure", "openssl" ] } 
+grpcio = { version = "0.4.3", default-features = false, features = [ "protobuf-codec" ] }
+protobuf = "~2"
+
+[build-dependencies]
+protoc-grpcio = "1.0.1"

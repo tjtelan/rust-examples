@@ -1,0 +1,18 @@
+This requires a little bit of setup on your build host.
+
+Requirements:
+- protoc
+- clang
+- rust 2018
+  - protobuf-codegen
+    - cargo install protobuf-codegen
+  - grpc-compiler
+    - cargo install grpc-compiler
+- Go v1.11 (Only required if we are building with "secure" feature enabled)
+
+# To run the examples, you'll need 2 terminals
+
+- Terminal 1:
+  - `cargo run --bin server`
+- Terminal 2:
+  - `cargo run --bin client -- 51719`
