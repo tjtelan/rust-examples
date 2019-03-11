@@ -1,0 +1,9 @@
+[package]
+name = "vault"
+version = "0.1.0"
+authors = ["T.J. Telan <t.telan@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+hashicorp_vault = "0.6.1" # This crate doesn't support Vault kv version 2
+dotenv = "0.9.0"
