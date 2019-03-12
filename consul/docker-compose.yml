@@ -1,0 +1,15 @@
+version: '3'
+services:
+  consul:
+    image: consul:1.4.3
+    container_name: consul
+    ports:
+      - 8500:8500
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+    command:
+      - consul
+      - agent
+      - -dev
+      - -ui
+      - -client=0.0.0.0

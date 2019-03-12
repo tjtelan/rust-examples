@@ -1,0 +1,7 @@
+# To get compiling on MacOS, you need to install openssl, and set these environment vars
+brew install openssl@1.1
+
+export OPENSSL_ROOT_DIR=$(brew --prefix openssl)
+export OPENSSL_LIB_DIR=$(brew --prefix openssl)"/lib"
+export OPENSSL_INCLUDE_DIR=$(brew --prefix openssl)"/include"
+cargo run
