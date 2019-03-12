@@ -1,0 +1,3 @@
+docker-compose up -d
+cargo run --bin nsq-consumer
+cargo run --bin nsq-producer

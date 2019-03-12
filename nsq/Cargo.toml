@@ -1,0 +1,18 @@
+[package]
+name = "nsq-example"
+version = "0.1.0"
+authors = ["T.J. Telan <t.telan@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+nsqueue = "0.1.5"
+futures = "^0.1"
+tokio-core = "^0.1"
+
+[[bin]]
+name = "nsq-producer"
+path = "src/producer.rs"
+
+[[bin]]
+name = "nsq-consumer"
+path = "src/consumer.rs"
