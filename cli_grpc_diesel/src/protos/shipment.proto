@@ -1,0 +1,50 @@
+syntax = "proto3";
+package shipment;
+
+import "google/protobuf/timestamp.proto";
+
+service Refinery {
+  rpc Status(OrderID) returns (OrderRecord);
+  rpc Order(OrderForm) returns (OrderStatus);
+  //rpc GetAllRecords() returns (OrderRecordList);
+}
+
+// From chart on wikipedia - top US oil products
+enum OilProductType {
+  GASOLINE = 0;
+  JETFUEL = 1;
+  DIESEL = 2;
+  ASPHALT = 3;
+  HEAVY = 4;
+  LUBRICANT = 5;
+  OTHER = 6;
+}
+
+message OrderForm {
+  int32 quantity = 2;
+  OilProductType product = 3;
+}
+
+enum OrderResponseType {
+  UNKNOWN  = 0;
+  RECEIVED = 1;
+  REJECTED = 2;
+}
+
+message OrderStatus {
+  OrderResponseType status = 1;
+}
+
+message OrderID {
+  int32 id = 1;
+}
+
+message OrderRecord {
+  OrderID id = 1;
+  OrderForm order = 2;
+  google.protobuf.Timestamp received_time = 3;
+}
+
+message OrderRecordList {
+  OrderRecord order = 1;
+}

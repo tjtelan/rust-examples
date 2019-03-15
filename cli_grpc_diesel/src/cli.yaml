@@ -1,0 +1,29 @@
+name: oil-cli 
+version: "0.1"
+author: T.J. Telan <t.telan@gmail.com>
+about: Example client-side cli to demonstrate protobufs and diesel crate interactions
+
+args:
+  - debug:
+      help: "Turn on debugging"
+      long: "debug"
+
+subcommands:
+  - status:
+      about: Get the status about a specific order
+      args:
+        - orderid:
+            help: ID of order you want status
+            index: 1
+            required: true
+  - order:
+      about: Send a shipment order to the refinery
+      args:
+        - quantity:
+            help: The number of things you want to order
+            index: 1
+            required: true
+        - product:
+            help: The product to be produced by the oil
+            index: 2
+            required: true
