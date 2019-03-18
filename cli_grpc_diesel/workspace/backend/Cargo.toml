@@ -1,0 +1,24 @@
+[package]
+name = "backend-example"
+version = "0.1.0"
+authors = ["T.J. Telan <t.telan@gmail.com>"]
+edition = "2018"
+build = "../build.rs"
+
+[lib]
+name = "protos"
+path = "../protos/mod.rs"
+
+[dependencies]
+clap = { version = "2.32.0", features = ["yaml"] }
+futures = "0.1.16"
+grpcio = { version = "0.5.0", path = "../../grpc-rs" }
+protobuf = "~2"
+
+[[bin]]
+name = "backend"
+path = "src/backend.rs"
+
+# For build.rs
+[build-dependencies]
+protoc-grpcio = "1.0.1"
