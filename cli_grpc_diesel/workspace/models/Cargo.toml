@@ -1,0 +1,16 @@
+[package]
+name = "diesel-models-example"
+version = "0.1.0"
+authors = ["T.J. Telan <t.telan@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+futures = "0.1.16"
+grpcio = { version = "0.5.0", path = "../../grpc-rs" }
+protobuf = "~2"
+diesel = { version = "1.0.0", features = ["postgres"] }
+diesel-derive-enum = { version = "0.4", features = ["postgres"] }
+
+[lib]
+name = "models"
+path = "mod.rs"

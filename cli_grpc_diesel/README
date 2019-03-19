@@ -69,3 +69,12 @@ After more reading of the Diesel walkthrough, it appears that the proto structs 
 
 Is this maintainable? Going to say no.
 
+---
+
+Third attempt:
+
+Started out with moving the codebase to use Cargo Workspaces. This took a moment but it is now done.
+
+Diesel's getting started guide sets up an environment that requires a running database to infer the schema. This is a nice feature, but we don't want to use it. I commented out the contents of `diesel.toml`
+
+Additionally, as a way to keep the diesel and gRPC code reasonably separate, I made them their own crates and added them as additional workspaces. Build warnings suggesting I compile client and backend separately have disappeared.
