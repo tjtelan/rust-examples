@@ -7,6 +7,10 @@
 extern crate clap;
 use clap::App;
 
+extern crate models;
+use models::{client, schema};
+
+
 //use std::io::Read;
 //use std::sync::Arc;
 //use std::{io, thread};
@@ -92,6 +96,11 @@ fn main() {
     let matches = App::from_yaml(cli_yaml).get_matches();
 
     println!("{:?}", matches);
+
+
+	let conn = client::establish_connection();
+
+	let new_order = client::create_order(&conn, 1, schema::OilProductEnum::DIESEL);
 
     // Now let's set up the gRPC server with our local implementation of the Refinery trait
     // ServerBuilder takes in a grpcio::Environment (for threadpooling),

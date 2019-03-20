@@ -1,4 +1,4 @@
-CREATE TYPE oil_products AS ENUM (
+CREATE TYPE oil_product AS ENUM (
   'GASOLINE',
   'JETFUEL',
   'DIESEL',
@@ -11,5 +11,5 @@ CREATE TYPE oil_products AS ENUM (
 CREATE TABLE orders (
   id SERIAL PRIMARY KEY,
   quantity INTEGER NOT NULL,
-  product oil_products NOT NULL
+  product_type oil_product NOT NULL
 );

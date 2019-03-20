@@ -51,7 +51,7 @@ impl OrderForm {
         self.quantity
     }
 
-    // .shipment.OilProductType product = 3;
+    // .refinery.OilProductType product = 3;
 
     pub fn clear_product(&mut self) {
         self.product = OilProductType::GASOLINE;
@@ -222,7 +222,7 @@ impl OrderStatus {
         ::std::default::Default::default()
     }
 
-    // .shipment.OrderResponseType status = 1;
+    // .refinery.OrderResponseType status = 1;
 
     pub fn clear_status(&mut self) {
         self.status = OrderResponseType::UNKNOWN;
@@ -532,7 +532,7 @@ impl OrderRecord {
         ::std::default::Default::default()
     }
 
-    // .shipment.OrderID id = 1;
+    // .refinery.OrderID id = 1;
 
     pub fn clear_id(&mut self) {
         self.id.clear();
@@ -565,7 +565,7 @@ impl OrderRecord {
         self.id.as_ref().unwrap_or_else(|| OrderID::default_instance())
     }
 
-    // .shipment.OrderForm order = 2;
+    // .refinery.OrderForm order = 2;
 
     pub fn clear_order(&mut self) {
         self.order.clear();
@@ -822,7 +822,7 @@ impl OrderRecordList {
         ::std::default::Default::default()
     }
 
-    // .shipment.OrderRecord order = 1;
+    // .refinery.OrderRecord order = 1;
 
     pub fn clear_order(&mut self) {
         self.order.clear();
@@ -1115,23 +1115,23 @@ impl ::protobuf::reflect::ProtobufValue for OrderResponseType {
 }
 
 static file_descriptor_proto_data: &'static [u8] = b"\
-    \n\x0eshipment.proto\x12\x08shipment\x1a\x1fgoogle/protobuf/timestamp.pr\
+    \n\x0erefinery.proto\x12\x08refinery\x1a\x1fgoogle/protobuf/timestamp.pr\
     oto\"[\n\tOrderForm\x12\x1a\n\x08quantity\x18\x02\x20\x01(\x05R\x08quant\
-    ity\x122\n\x07product\x18\x03\x20\x01(\x0e2\x18.shipment.OilProductTypeR\
+    ity\x122\n\x07product\x18\x03\x20\x01(\x0e2\x18.refinery.OilProductTypeR\
     \x07product\"B\n\x0bOrderStatus\x123\n\x06status\x18\x01\x20\x01(\x0e2\
-    \x1b.shipment.OrderResponseTypeR\x06status\"\x19\n\x07OrderID\x12\x0e\n\
+    \x1b.refinery.OrderResponseTypeR\x06status\"\x19\n\x07OrderID\x12\x0e\n\
     \x02id\x18\x01\x20\x01(\x05R\x02id\"\x9c\x01\n\x0bOrderRecord\x12!\n\x02\
-    id\x18\x01\x20\x01(\x0b2\x11.shipment.OrderIDR\x02id\x12)\n\x05order\x18\
-    \x02\x20\x01(\x0b2\x13.shipment.OrderFormR\x05order\x12?\n\rreceived_tim\
+    id\x18\x01\x20\x01(\x0b2\x11.refinery.OrderIDR\x02id\x12)\n\x05order\x18\
+    \x02\x20\x01(\x0b2\x13.refinery.OrderFormR\x05order\x12?\n\rreceived_tim\
     e\x18\x03\x20\x01(\x0b2\x1a.google.protobuf.TimestampR\x0creceivedTime\"\
-    >\n\x0fOrderRecordList\x12+\n\x05order\x18\x01\x20\x01(\x0b2\x15.shipmen\
-    t.OrderRecordR\x05order*i\n\x0eOilProductType\x12\x0c\n\x08GASOLINE\x10\
+    >\n\x0fOrderRecordList\x12+\n\x05order\x18\x01\x20\x01(\x0b2\x15.refiner\
+    y.OrderRecordR\x05order*i\n\x0eOilProductType\x12\x0c\n\x08GASOLINE\x10\
     \0\x12\x0b\n\x07JETFUEL\x10\x01\x12\n\n\x06DIESEL\x10\x02\x12\x0b\n\x07A\
     SPHALT\x10\x03\x12\t\n\x05HEAVY\x10\x04\x12\r\n\tLUBRICANT\x10\x05\x12\t\
     \n\x05OTHER\x10\x06*<\n\x11OrderResponseType\x12\x0b\n\x07UNKNOWN\x10\0\
     \x12\x0c\n\x08RECEIVED\x10\x01\x12\x0c\n\x08REJECTED\x10\x022s\n\x08Refi\
-    nery\x122\n\x06Status\x12\x11.shipment.OrderID\x1a\x15.shipment.OrderRec\
-    ord\x123\n\x05Order\x12\x13.shipment.OrderForm\x1a\x15.shipment.OrderSta\
+    nery\x122\n\x06Status\x12\x11.refinery.OrderID\x1a\x15.refinery.OrderRec\
+    ord\x123\n\x05Order\x12\x13.refinery.OrderForm\x1a\x15.refinery.OrderSta\
     tusb\x06proto3\
 ";
 

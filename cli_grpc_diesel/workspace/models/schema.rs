@@ -1,5 +1,27 @@
-#[derive(Debug,DbEnum)]
-pub enum OilProduct {
+use diesel::pg::Pg;
+use diesel::deserialize::{self, FromSql};
+use diesel::serialize::{self, IsNull, Output, ToSql};
+use std::io::Write;
+
+table! {
+    use diesel::sql_types::{Integer, Timestamp};
+    use super::OilProductType;
+
+    orders {
+        id -> Integer,
+        quantity -> Integer,
+        product_type -> OilProductType,
+    }
+}
+
+// Note to self. These names are kind of terrible. Think about this pattern for future projects.
+#[derive(SqlType, Debug)]
+#[postgres(type_name="oil_product")]
+pub struct OilProductType;
+
+#[derive(Debug, Clone, PartialEq, FromSqlRow, AsExpression)]
+#[sql_type="OilProductType"]
+pub enum OilProductEnum {
   GASOLINE,
   JETFUEL,
   DIESEL,
@@ -9,13 +31,32 @@ pub enum OilProduct {
   OTHER,
 }
 
-table! {
-    use diesel::sql_types::Integer;
-    use super::OilProductMapping;
+impl ToSql<OilProductType, Pg> for OilProductEnum {
+    fn to_sql<W: Write>(&self, out: &mut Output<W, Pg>) -> serialize::Result {
+        match *self {
+            OilProductEnum::GASOLINE => out.write_all(b"GASOLINE")?,
+            OilProductEnum::JETFUEL => out.write_all(b"JETFUEL")?,
+            OilProductEnum::DIESEL => out.write_all(b"DIESEL")?,
+            OilProductEnum::ASPHALT => out.write_all(b"ASPHALT")?,
+            OilProductEnum::HEAVY => out.write_all(b"HEAVY")?,
+            OilProductEnum::LUBRICANT => out.write_all(b"LUBRICANT")?,
+            OilProductEnum::OTHER => out.write_all(b"OTHER")?,
+        }
+        Ok(IsNull::No)
+    }
+}
 
-    orders {
-        id -> Integer,
-        quantity -> Integer,
-        product_type -> OilProductMapping,
+impl FromSql<OilProductType, Pg> for OilProductEnum {
+    fn from_sql(bytes: Option<&[u8]>) -> deserialize::Result<Self> {
+        match not_none!(bytes) {
+            b"GASOLINE" => Ok(OilProductEnum::GASOLINE),
+            b"JETFUEL" => Ok(OilProductEnum::JETFUEL),
+            b"DIESEL" => Ok(OilProductEnum::DIESEL),
+            b"ASPHALT" => Ok(OilProductEnum::ASPHALT),
+            b"HEAVY" => Ok(OilProductEnum::HEAVY),
+            b"LUBRICANT" => Ok(OilProductEnum::LUBRICANT),
+            b"OTHER" => Ok(OilProductEnum::OTHER),
+            _ => Err("Unrecognized enum variant".into()),
+        }
     }
 }

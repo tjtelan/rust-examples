@@ -18,16 +18,16 @@
 #![allow(unused_imports)]
 #![allow(unused_results)]
 
-const METHOD_REFINERY_STATUS: ::grpcio::Method<super::shipment::OrderID, super::shipment::OrderRecord> = ::grpcio::Method {
+const METHOD_REFINERY_STATUS: ::grpcio::Method<super::refinery::OrderID, super::refinery::OrderRecord> = ::grpcio::Method {
     ty: ::grpcio::MethodType::Unary,
-    name: "/shipment.Refinery/Status",
+    name: "/refinery.Refinery/Status",
     req_mar: ::grpcio::Marshaller { ser: ::grpcio::pb_ser, de: ::grpcio::pb_de },
     resp_mar: ::grpcio::Marshaller { ser: ::grpcio::pb_ser, de: ::grpcio::pb_de },
 };
 
-const METHOD_REFINERY_ORDER: ::grpcio::Method<super::shipment::OrderForm, super::shipment::OrderStatus> = ::grpcio::Method {
+const METHOD_REFINERY_ORDER: ::grpcio::Method<super::refinery::OrderForm, super::refinery::OrderStatus> = ::grpcio::Method {
     ty: ::grpcio::MethodType::Unary,
-    name: "/shipment.Refinery/Order",
+    name: "/refinery.Refinery/Order",
     req_mar: ::grpcio::Marshaller { ser: ::grpcio::pb_ser, de: ::grpcio::pb_de },
     resp_mar: ::grpcio::Marshaller { ser: ::grpcio::pb_ser, de: ::grpcio::pb_de },
 };
@@ -44,35 +44,35 @@ impl RefineryClient {
         }
     }
 
-    pub fn status_opt(&self, req: &super::shipment::OrderID, opt: ::grpcio::CallOption) -> ::grpcio::Result<super::shipment::OrderRecord> {
+    pub fn status_opt(&self, req: &super::refinery::OrderID, opt: ::grpcio::CallOption) -> ::grpcio::Result<super::refinery::OrderRecord> {
         self.client.unary_call(&METHOD_REFINERY_STATUS, req, opt)
     }
 
-    pub fn status(&self, req: &super::shipment::OrderID) -> ::grpcio::Result<super::shipment::OrderRecord> {
+    pub fn status(&self, req: &super::refinery::OrderID) -> ::grpcio::Result<super::refinery::OrderRecord> {
         self.status_opt(req, ::grpcio::CallOption::default())
     }
 
-    pub fn status_async_opt(&self, req: &super::shipment::OrderID, opt: ::grpcio::CallOption) -> ::grpcio::Result<::grpcio::ClientUnaryReceiver<super::shipment::OrderRecord>> {
+    pub fn status_async_opt(&self, req: &super::refinery::OrderID, opt: ::grpcio::CallOption) -> ::grpcio::Result<::grpcio::ClientUnaryReceiver<super::refinery::OrderRecord>> {
         self.client.unary_call_async(&METHOD_REFINERY_STATUS, req, opt)
     }
 
-    pub fn status_async(&self, req: &super::shipment::OrderID) -> ::grpcio::Result<::grpcio::ClientUnaryReceiver<super::shipment::OrderRecord>> {
+    pub fn status_async(&self, req: &super::refinery::OrderID) -> ::grpcio::Result<::grpcio::ClientUnaryReceiver<super::refinery::OrderRecord>> {
         self.status_async_opt(req, ::grpcio::CallOption::default())
     }
 
-    pub fn order_opt(&self, req: &super::shipment::OrderForm, opt: ::grpcio::CallOption) -> ::grpcio::Result<super::shipment::OrderStatus> {
+    pub fn order_opt(&self, req: &super::refinery::OrderForm, opt: ::grpcio::CallOption) -> ::grpcio::Result<super::refinery::OrderStatus> {
         self.client.unary_call(&METHOD_REFINERY_ORDER, req, opt)
     }
 
-    pub fn order(&self, req: &super::shipment::OrderForm) -> ::grpcio::Result<super::shipment::OrderStatus> {
+    pub fn order(&self, req: &super::refinery::OrderForm) -> ::grpcio::Result<super::refinery::OrderStatus> {
         self.order_opt(req, ::grpcio::CallOption::default())
     }
 
-    pub fn order_async_opt(&self, req: &super::shipment::OrderForm, opt: ::grpcio::CallOption) -> ::grpcio::Result<::grpcio::ClientUnaryReceiver<super::shipment::OrderStatus>> {
+    pub fn order_async_opt(&self, req: &super::refinery::OrderForm, opt: ::grpcio::CallOption) -> ::grpcio::Result<::grpcio::ClientUnaryReceiver<super::refinery::OrderStatus>> {
         self.client.unary_call_async(&METHOD_REFINERY_ORDER, req, opt)
     }
 
-    pub fn order_async(&self, req: &super::shipment::OrderForm) -> ::grpcio::Result<::grpcio::ClientUnaryReceiver<super::shipment::OrderStatus>> {
+    pub fn order_async(&self, req: &super::refinery::OrderForm) -> ::grpcio::Result<::grpcio::ClientUnaryReceiver<super::refinery::OrderStatus>> {
         self.order_async_opt(req, ::grpcio::CallOption::default())
     }
     pub fn spawn<F>(&self, f: F) where F: ::futures::Future<Item = (), Error = ()> + Send + 'static {
@@ -81,8 +81,8 @@ impl RefineryClient {
 }
 
 pub trait Refinery {
-    fn status(&mut self, ctx: ::grpcio::RpcContext, req: super::shipment::OrderID, sink: ::grpcio::UnarySink<super::shipment::OrderRecord>);
-    fn order(&mut self, ctx: ::grpcio::RpcContext, req: super::shipment::OrderForm, sink: ::grpcio::UnarySink<super::shipment::OrderStatus>);
+    fn status(&mut self, ctx: ::grpcio::RpcContext, req: super::refinery::OrderID, sink: ::grpcio::UnarySink<super::refinery::OrderRecord>);
+    fn order(&mut self, ctx: ::grpcio::RpcContext, req: super::refinery::OrderForm, sink: ::grpcio::UnarySink<super::refinery::OrderStatus>);
 }
 
 pub fn create_refinery<S: Refinery + Send + Clone + 'static>(s: S) -> ::grpcio::Service {

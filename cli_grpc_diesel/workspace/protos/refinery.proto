@@ -1,5 +1,5 @@
 syntax = "proto3";
-package shipment;
+package refinery;
 
 import "google/protobuf/timestamp.proto";
 
