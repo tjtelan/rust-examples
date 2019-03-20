@@ -18,14 +18,15 @@ pub fn establish_connection() -> PgConnection {
 
 pub fn create_order(conn : &PgConnection, quantity : i32, product_type : OilProductEnum) -> Order {
 
-    //let timestamp = NaiveDateTime::from_timestamp(0,Utc::now().timestamp_subsec_nanos());
+    let timestamp = NaiveDateTime::from_timestamp(Utc::now().timestamp(),0);
 
     let new_order = vec![
-		NewOrder {
-        	quantity : quantity,
-        	product_type : product_type,
-		},
-	];
+        NewOrder {
+            quantity : quantity,
+            product_type : product_type,
+            received_time : timestamp,
+        },
+    ];
 
     diesel::insert_into(orders::table)
         .values(&new_order)

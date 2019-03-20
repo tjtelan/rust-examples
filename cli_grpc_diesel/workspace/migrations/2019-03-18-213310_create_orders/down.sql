@@ -1,2 +1,2 @@
 DROP TABLE orders;
-DROP TYPE oil_products;
+DROP TYPE oil_product;

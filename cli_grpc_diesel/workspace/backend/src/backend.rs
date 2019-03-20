@@ -98,9 +98,9 @@ fn main() {
     println!("{:?}", matches);
 
 
-	let conn = client::establish_connection();
+    let conn = client::establish_connection();
 
-	let new_order = client::create_order(&conn, 1, schema::OilProductEnum::DIESEL);
+    let new_order = client::create_order(&conn, 1, schema::OilProductEnum::DIESEL);
 
     // Now let's set up the gRPC server with our local implementation of the Refinery trait
     // ServerBuilder takes in a grpcio::Environment (for threadpooling),

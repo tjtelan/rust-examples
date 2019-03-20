@@ -7,6 +7,7 @@ pub struct Order {
     pub id: i32,
     pub quantity: i32,
     pub product_type : OilProductEnum,
+    pub received_time : NaiveDateTime,
 }
 
 #[derive(Insertable, Debug, PartialEq)]
@@ -14,5 +15,5 @@ pub struct Order {
 pub struct NewOrder {
     pub quantity: i32,
     pub product_type : OilProductEnum,
-//    pub received_time : NaiveDateTime,
+    pub received_time : NaiveDateTime,
 }

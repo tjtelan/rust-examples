@@ -11,6 +11,7 @@ table! {
         id -> Integer,
         quantity -> Integer,
         product_type -> OilProductType,
+        received_time -> Timestamp,
     }
 }
 
