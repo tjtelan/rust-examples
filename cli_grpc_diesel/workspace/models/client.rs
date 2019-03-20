@@ -4,7 +4,7 @@ use dotenv::dotenv;
 use std::env;
 
 use crate::schema::{orders, OilProductEnum};
-use crate::orders::{Order};
+use crate::orders::{Order,NewOrder};
 use chrono::{DateTime, Utc, NaiveDateTime};
 
 pub fn establish_connection() -> PgConnection {
@@ -21,8 +21,7 @@ pub fn create_order(conn : &PgConnection, quantity : i32, product_type : OilProd
     //let timestamp = NaiveDateTime::from_timestamp(0,Utc::now().timestamp_subsec_nanos());
 
     let new_order = vec![
-		Order {
-			id : 1,
+		NewOrder {
         	quantity : quantity,
         	product_type : product_type,
 		},
