@@ -17,3 +17,8 @@ pub struct NewOrder {
     pub product_type : OilProductEnum,
     pub received_time : NaiveDateTime,
 }
+
+pub struct OrderForm {
+    pub quantity : i32,
+    pub product_type : OilProductEnum,
+}

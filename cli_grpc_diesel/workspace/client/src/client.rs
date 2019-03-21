@@ -10,9 +10,9 @@ use std::sync::Arc;
 use grpcio::{ChannelBuilder, EnvBuilder};
 use protobuf::RepeatedField;
 
-use protos::shipment_grpc::RefineryClient;
-use protos::shipment::{OrderForm, OrderStatus, OrderID, OrderRecord, OilProductType};
-
+use protos::refinery_grpc::RefineryClient;
+use protos::refinery::{OrderForm, OrderStatus, OilProductType, OrderResponseType};
+//
 fn main() {
 
     // Parse the command line first. Let's keep it simple...
@@ -33,18 +33,18 @@ fn main() {
     // Here's where we create our proto objects, after parsing cli input
 
 
-    if let Some(matches) = matches.subcommand_matches("status") {
-        let id = matches.value_of("orderid").unwrap().parse::<i32>().expect("ID should be a number");
-        println!("Get logs for shipment number: {}", id);
+    //if let Some(matches) = matches.subcommand_matches("status") {
+    //    let id = matches.value_of("orderid").unwrap().parse::<i32>().expect("ID should be a number");
+    //    println!("Get logs for shipment number: {}", id);
 
-        let mut orderid = OrderID::new();
-        orderid.set_id(id);
+    //    let mut orderid = OrderID::new();
+    //    orderid.set_id(id);
 
-        // Send the gRPC message
-        let order_status = client.status(&orderid).expect("RPC Failed!");
+    //    // Send the gRPC message
+    //    let order_status = client.status(&orderid).expect("RPC Failed!");
 
-        println!("Order status: {:?}", order_status);
-    }
+    //    println!("Order status: {:?}", order_status);
+    //}
 
     if let Some(matches) = matches.subcommand_matches("order") {
 
@@ -64,6 +64,9 @@ fn main() {
          
         println!("To be refined into: {:?}", product);
 
+
+        // TODO: 
+
         // We're going to make an order
         // Build our data payload.
         let mut order = OrderForm::new();
@@ -74,7 +77,6 @@ fn main() {
         let order_status = client.order(&order).expect("RPC Failed!");
 
         println!("Order status: {:?}", order_status);
-
 
     }
     

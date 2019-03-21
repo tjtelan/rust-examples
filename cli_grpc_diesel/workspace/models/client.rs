@@ -3,7 +3,7 @@ use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use std::env;
 
-use crate::schema::{orders, OilProductEnum};
+use crate::schema::{orders, OilProductEnum, OilProductType};
 use crate::orders::{Order,NewOrder};
 use chrono::{DateTime, Utc, NaiveDateTime};
 

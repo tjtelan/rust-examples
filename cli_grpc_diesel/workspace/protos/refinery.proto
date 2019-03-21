@@ -4,7 +4,7 @@ package refinery;
 import "google/protobuf/timestamp.proto";
 
 service Refinery {
-  rpc Status(OrderID) returns (OrderRecord);
+  //rpc Status(OrderID) returns (OrderRecord);
   rpc Order(OrderForm) returns (OrderStatus);
   //rpc GetAllRecords() returns (OrderRecordList);
 }
@@ -35,16 +35,16 @@ message OrderStatus {
   OrderResponseType status = 1;
 }
 
-message OrderID {
-  int32 id = 1;
-}
+//message OrderID {
+//  int32 id = 1;
+//}
 
-message OrderRecord {
-  OrderID id = 1;
-  OrderForm order = 2;
-  google.protobuf.Timestamp received_time = 3;
-}
+//message OrderRecord {
+//  OrderID id = 1;
+//  OrderForm order = 2;
+//  google.protobuf.Timestamp received_time = 3;
+//}
 
-message OrderRecordList {
-  OrderRecord order = 1;
-}
+//message OrderRecordList {
+//  OrderRecord order = 1;
+//}
