@@ -38,7 +38,7 @@ pub fn create_order(conn : &PgConnection, order_form : OrderForm) -> Order {
         .expect("Error saving new order")
 }
 
-pub fn order_received_success() -> refinery::OrderStatus {
+pub fn new_received_success() -> refinery::OrderStatus {
     let mut order_status = refinery::OrderStatus::new();
     order_status.set_status(refinery::OrderResponseType::RECEIVED);
     order_status

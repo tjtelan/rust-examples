@@ -13,6 +13,8 @@ use protobuf::RepeatedField;
 use protos::refinery_grpc::RefineryClient;
 use protos::refinery::{OrderForm, OrderStatus, OilProductType, OrderResponseType};
 
+use models::orders;
+
 fn main() {
 
     // Parse the command line first. Let's keep it simple...
@@ -52,26 +54,30 @@ fn main() {
         println!("# of barrels to ship to refinery: {:?}", quantity);
 
         // Convert product to enum
-        let product = match matches.value_of("product").unwrap() {
-            "gasoline" => OilProductType::GASOLINE,
-            "jetfuel" => OilProductType::JETFUEL,
-            "diesel" => OilProductType::DIESEL,
-            "asphalt" => OilProductType::ASPHALT,
-            "heavy" => OilProductType::HEAVY,
-            "lubricant" => OilProductType::LUBRICANT,
-            _ => OilProductType::OTHER,
-        };
+        let product = matches.value_of("product").unwrap();
+        //let product = match matches.value_of("product").unwrap() {
+        //    "gasoline" => OilProductType::GASOLINE,
+        //    "jetfuel" => OilProductType::JETFUEL,
+        //    "diesel" => OilProductType::DIESEL,
+        //    "asphalt" => OilProductType::ASPHALT,
+        //    "heavy" => OilProductType::HEAVY,
+        //    "lubricant" => OilProductType::LUBRICANT,
+        //    _ => OilProductType::OTHER,
+        //};
          
         println!("To be refined into: {:?}", product);
 
+        // This line has weird errors
+        let order = orders::OrderForm::new(quantity, product.to_string());
+
         // We're going to make an order
         // Build our data payload.
-        let mut order = OrderForm::new();
-        order.set_quantity(quantity);
-        order.set_product(product);
+        //let mut order = OrderForm::new();
+        //order.set_quantity(quantity);
+        //order.set_product(product);
 
-        // Send the gRPC message
-        let order_status = client.order(&order).expect("RPC Failed!");
+        //// Send the gRPC message
+        let order_status = client.order(&OrderForm::from(order)).expect("RPC Failed!");
 
         println!("Order status: {:?}", order_status);
 

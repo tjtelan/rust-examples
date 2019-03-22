@@ -27,13 +27,13 @@ pub struct OrderForm {
 
 impl OrderForm {
     // This is for taking in command line input from a client
-    pub fn new(q : i32, p : &'static str) -> Self {
+    pub fn new(q : i32, p : String) -> Self {
 
         //let quantity = matches.value_of("quantity").unwrap().parse::<i32>().expect("Quantity should be a number");
         println!("# of barrels to ship to refinery: {:?}", q);
 
         // Convert product to enum
-        let product = match p {
+        let product = match p.as_ref() {
             "gasoline" => OilProductEnum::GASOLINE,
             "jetfuel" => OilProductEnum::JETFUEL,
             "diesel" => OilProductEnum::DIESEL,
