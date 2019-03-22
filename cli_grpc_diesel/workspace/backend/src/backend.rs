@@ -1,14 +1,11 @@
-//extern crate grpcio;
 extern crate protos;
-//
-//use std::time::{Duration, SystemTime};
 
 #[macro_use]
 extern crate clap;
 use clap::App;
 
 extern crate models;
-use models::{client, schema};
+use models::{client, schema, orders};
 
 
 use std::io::Read;
@@ -18,8 +15,8 @@ use std::{io, thread};
 use futures::sync::oneshot;
 use futures::Future;
 use grpcio::{Environment, RpcContext, ServerBuilder, UnarySink};
-//
-use protos::refinery::{OrderForm, OrderStatus, OrderResponseType, OilProductType};
+
+use protos::refinery;
 use protos::refinery_grpc::{self, Refinery}; // `self` is *probably* for ::create_refinery
 
 use models::schema::{OilProductEnum};
@@ -27,37 +24,16 @@ use models::schema::{OilProductEnum};
 // This is the start of our local implementation of the gRPC service using the protobuf spec
 #[derive(Clone)]
 struct RefineryService;
-//
-//
-//// Messing around with getting system timestamps for shipment orders, and shoving it into protobuf types
-//fn get_proto_timestamp() -> ::protobuf::well_known_types::Timestamp {
-//    let timestamp = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as i64;
-//    let mut prototimestamp = ::protobuf::well_known_types::Timestamp::new();
-//    prototimestamp.set_seconds(timestamp);
-//    prototimestamp
-//}
-//
-//
+
 //// We're going to implement the Refinery trait on our own struct.
 //// These are the methods used by the client.
 impl Refinery for RefineryService {
-    fn order(&mut self, ctx: RpcContext, req: OrderForm, sink: UnarySink<OrderStatus>) {
-
-        // Can I connect to db before registering this service?
-        let conn = client::establish_connection();
+    fn order(&mut self, ctx: RpcContext, req: refinery::OrderForm, sink: UnarySink<refinery::OrderStatus>) {
 
         println!("Received an order: {:?}", req);
 
         // Creating the return object
-        let mut order_status = OrderStatus::new();
-
-
-        // Probably a DB insert could happen here so we can set
-        // the status appropriately if errors happen
-        //
-        // Just returning immediately for now
-
-        order_status.set_status(OrderResponseType::RECEIVED);
+        let order_status = client::order_received_success();
 
         // ???: Map successful result on the Sink
         let f = sink
@@ -65,24 +41,15 @@ impl Refinery for RefineryService {
             .map(move |_| println!("Responded with status {{ {:?} }}", order_status))
             .map_err(move |err| eprintln!("Failed to reply: {:?}", err));
 
-        // FIXME: Bleh.
-        let product = match req.get_product() {
-            OilProductType::GASOLINE => OilProductEnum::GASOLINE,
-            OilProductType::JETFUEL => OilProductEnum::JETFUEL,
-            OilProductType::DIESEL => OilProductEnum::DIESEL,
-            OilProductType::ASPHALT => OilProductEnum::ASPHALT,
-            OilProductType::HEAVY => OilProductEnum::HEAVY,
-            OilProductType::LUBRICANT => OilProductEnum::LUBRICANT,
-            OilProductType::OTHER => OilProductEnum::OTHER,
-        };
- 
-        // TODO: Can I pass OrderForm to this function?
-        let new_order = client::create_order(&conn, req.get_quantity(), product);
+        // FIXME: Instead, can I connect to db before registering this service? Is that thread-safe?
+        let conn = client::establish_connection();
+        // Convert the received proto request into our native type
+        let new_order = client::create_order(&conn, orders::OrderForm::from(req));
 
         ctx.spawn(f)
     }
 }
-//
+
 //    fn status(&mut self, ctx: RpcContext, req: OrderID, sink: UnarySink<OrderRecord>) {
 //        println!("Request for status on order ID: {:?}", req);
 //
@@ -117,9 +84,6 @@ fn main() {
     let matches = App::from_yaml(cli_yaml).get_matches();
 
     println!("{:?}", matches);
-
-
-    //let new_order = client::create_order(&conn, 1, schema::OilProductEnum::DIESEL);
 
     // Now let's set up the gRPC server with our local implementation of the Refinery trait
     // ServerBuilder takes in a grpcio::Environment (for threadpooling),

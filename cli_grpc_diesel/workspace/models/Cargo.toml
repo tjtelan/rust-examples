@@ -12,6 +12,7 @@ diesel = { version = "1.0.0", features = ["postgres", "chrono"] }
 diesel-derive-enum = { version = "0.4", features = ["postgres"] }
 dotenv = "0.9.0"
 chrono = "0.4"
+protos-example = { path = "../protos" }
 
 [lib]
 name = "models"

@@ -10,6 +10,7 @@ dotenv = "0.9.0"
 grpcio = { version = "0.5.0", path = "../../grpc-rs" }
 protobuf = "~2"
 protos-example = { path = "../protos" }
+diesel-models-example = { path = "../models" }
 
 [[bin]]
 name = "client"

@@ -12,7 +12,7 @@ use protobuf::RepeatedField;
 
 use protos::refinery_grpc::RefineryClient;
 use protos::refinery::{OrderForm, OrderStatus, OilProductType, OrderResponseType};
-//
+
 fn main() {
 
     // Parse the command line first. Let's keep it simple...
@@ -64,9 +64,6 @@ fn main() {
          
         println!("To be refined into: {:?}", product);
 
-
-        // TODO: 
-
         // We're going to make an order
         // Build our data payload.
         let mut order = OrderForm::new();
@@ -77,6 +74,7 @@ fn main() {
         let order_status = client.order(&order).expect("RPC Failed!");
 
         println!("Order status: {:?}", order_status);
+
 
     }
     
