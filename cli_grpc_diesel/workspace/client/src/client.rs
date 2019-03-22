@@ -1,18 +1,15 @@
-extern crate grpcio;
-extern crate protos;
-
 #[macro_use]
 extern crate clap;
 use clap::App;
 
 use std::sync::Arc;
 
+extern crate grpcio;
 use grpcio::{ChannelBuilder, EnvBuilder};
-use protobuf::RepeatedField;
 
+extern crate protos;
 use protos::refinery_grpc::RefineryClient;
-use protos::refinery::{OrderForm, OrderStatus, OilProductType, OrderResponseType};
-
+use protos::refinery;
 use models::orders;
 
 fn main() {
@@ -23,7 +20,6 @@ fn main() {
 
     println!("{:?}", matches);
 
-
     // Now let's talk to the grpc backend
 
     // Configure our client
@@ -31,9 +27,7 @@ fn main() {
     let ch = ChannelBuilder::new(env).connect(format!("localhost:55555").as_str());
     let client = RefineryClient::new(ch);
 
-
     // Here's where we create our proto objects, after parsing cli input
-
 
     //if let Some(matches) = matches.subcommand_matches("status") {
     //    let id = matches.value_of("orderid").unwrap().parse::<i32>().expect("ID should be a number");
@@ -55,33 +49,14 @@ fn main() {
 
         // Convert product to enum
         let product = matches.value_of("product").unwrap();
-        //let product = match matches.value_of("product").unwrap() {
-        //    "gasoline" => OilProductType::GASOLINE,
-        //    "jetfuel" => OilProductType::JETFUEL,
-        //    "diesel" => OilProductType::DIESEL,
-        //    "asphalt" => OilProductType::ASPHALT,
-        //    "heavy" => OilProductType::HEAVY,
-        //    "lubricant" => OilProductType::LUBRICANT,
-        //    _ => OilProductType::OTHER,
-        //};
-         
+
         println!("To be refined into: {:?}", product);
 
-        // This line has weird errors
         let order = orders::OrderForm::new(quantity, product.to_string());
 
-        // We're going to make an order
-        // Build our data payload.
-        //let mut order = OrderForm::new();
-        //order.set_quantity(quantity);
-        //order.set_product(product);
-
-        //// Send the gRPC message
-        let order_status = client.order(&OrderForm::from(order)).expect("RPC Failed!");
+        //// Send the gRPC message. Convert our custom type to the proto form
+        let order_status = client.order(&refinery::OrderForm::from(order)).expect("RPC Failed!");
 
         println!("Order status: {:?}", order_status);
-
-
     }
-    
 }

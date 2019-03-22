@@ -1,12 +1,6 @@
-extern crate protos;
-
 #[macro_use]
 extern crate clap;
 use clap::App;
-
-extern crate models;
-use models::{client, schema, orders};
-
 
 use std::io::Read;
 use std::sync::Arc;
@@ -16,10 +10,12 @@ use futures::sync::oneshot;
 use futures::Future;
 use grpcio::{Environment, RpcContext, ServerBuilder, UnarySink};
 
+extern crate models;
+use models::{client, orders};
+
+extern crate protos;
 use protos::refinery;
 use protos::refinery_grpc::{self, Refinery}; // `self` is *probably* for ::create_refinery
-
-use models::schema::{OilProductEnum};
 
 // This is the start of our local implementation of the gRPC service using the protobuf spec
 #[derive(Clone)]
@@ -44,7 +40,7 @@ impl Refinery for RefineryService {
         // FIXME: Instead, can I connect to db before registering this service? Is that thread-safe?
         let conn = client::establish_connection();
         // Convert the received proto request into our native type
-        let new_order = client::create_order(&conn, orders::OrderForm::from(req));
+        let _new_order = client::create_order(&conn, orders::OrderForm::from(req));
 
         ctx.spawn(f)
     }
