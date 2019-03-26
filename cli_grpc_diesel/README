@@ -5,13 +5,12 @@ The aim is to utilize protoc generated data structures, and carry that represent
 
 ```
 cargo install diesel_cli --features postgres
-cargo install diesel_cli_ext
 ```
 
 The example command line tool uses proto models on client and server-side.
 The story:
 The client side has an oil ordering tool.
-(Oil, bc get it...? proto+diesel, har har...)
+(Oil, bc get it...? protobufs + diesel, har har...)
 
 We'll have 2 initial actions:
 * Order a user-specified quantity, and a user-specified product of oil to a refinery
@@ -26,11 +25,11 @@ We want to highlight the following interactions:
 * Getting user input from the command line, and marshalling into a protobuf derived type (I'm calling this "proto-native").
 * Connecting to a backend grpc server, and sending/recieving proto-native data 
 * Receiving data from the client, and marshalling into a proto-native type
-* Reading/Writing native types into the database
+* Reading/Writing rust native types into the database
 
-# Build
+# Pre-Build
 
-## w/ TLS support
+## w/ TLS support (Most likely the version you want)
 The version of pingcap's grpc library that compiles w/ TLS support is only in their github repo at the time of writing.
 ```
 git clone https://github.com/pingcap/grpc-rs.git
@@ -45,36 +44,24 @@ You need to switch the reference to the grpcio dependency. See Cargo.toml
 The example `build.rs` is used to compile the protos.
 In our Cargo.toml, there are references for the proto-rust code as a library, and a mod.rs for import paths to use in cli.rs and server.rs.
 
----
+# The rough script
 
-First attempt I tried to configure diesel and protos at the same time, but it ended up being too complicated.
+```
+# Init grpc-rs
+git clone https://github.com/pingcap/grpc-rs.git
+pushd grpc-rs
+git submodule update --init --recursive
+popd
 
-Second attempt I got the gRPC communication working with the CLI, and then incorporating Diesel.
+# Start postgres
+docker-compose up -d
 
-Documenting setup:
-* Started postgres in docker
-* `diesel setup`
-* `diesel migration generate create_orders`
-* Looked at the OrderRecord proto type to write `up.sql`. I think I can just use integer types, and use grpc code to convert to the native types.
-* `diesel migration run` -- This generated `src/schema.rs`
+pushd workspace
 
-I tried to manually modify shipment.rs, but it was immediately regenerated. Considering disabling the automatic build.rs stuff so I can modify it after compilation.
+# Client
+cargo run --bin client -- order 1 diesel
+cargo run --bin client -- summary
 
-After more reading of the Diesel walkthrough, it appears that the proto structs may be unsuitable for Diesel. I fear that we will need to wrap some types around the protos. On the surface, that already sounds like a bit of double work.
-- Design the protos
-- Design the database tables
-- Generate the proto models
-- Wrap the proto models for Diesel #[derive()] annotations. Find out if I can just implement the traits? Hunch is no/not worth effort.
-- Have conversions to/from the proto models to use w/ Diesel.
-
-Is this maintainable? Going to say no.
-
----
-
-Third attempt:
-
-Started out with moving the codebase to use Cargo Workspaces. This took a moment but it is now done.
-
-Diesel's getting started guide sets up an environment that requires a running database to infer the schema. This is a nice feature, but we don't want to use it. I commented out the contents of `diesel.toml`
-
-Additionally, as a way to keep the diesel and gRPC code reasonably separate, I made them their own crates and added them as additional workspaces. Build warnings suggesting I compile client and backend separately have disappeared.
+# Backend
+cargo run --bin backend
+```

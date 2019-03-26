@@ -1,0 +1,97 @@
+In this example, we want to demonstrate the interactions between Protobufs and Diesel.
+
+The aim is to utilize protoc generated data structures, and carry that representation from a client over grpc to a backend and into the database through Diesel.
+
+
+```
+cargo install diesel_cli --features postgres
+cargo install diesel_cli_ext
+```
+
+The example command line tool uses proto models on client and server-side.
+The story:
+The client side has an oil ordering tool.
+(Oil, bc get it...? protobufs + diesel, har har...)
+
+We'll have 2 initial actions:
+* Order a user-specified quantity, and a user-specified product of oil to a refinery
+  * For the sake of this narrative, oil for these jobs is going to be magical, and infinite. For the purposes of having a regular shaped object to add into the DB.
+* Look at status of an order
+  * In a high-level summary
+    * List the shipments, and time of order
+  * In a per-shipment detail
+    * Show a report of the single order
+
+We want to highlight the following interactions:
+* Getting user input from the command line, and marshalling into a protobuf derived type (I'm calling this "proto-native").
+* Connecting to a backend grpc server, and sending/recieving proto-native data 
+* Receiving data from the client, and marshalling into a proto-native type
+* Reading/Writing native types into the database
+
+# Build
+
+## w/ TLS support (Most likely the version you want)
+The version of pingcap's grpc library that compiles w/ TLS support is only in their github repo at the time of writing.
+```
+git clone https://github.com/pingcap/grpc-rs.git
+cd grpc-rs
+git submodule update --init --recursive
+```
+
+## w/o TLS support
+You need to switch the reference to the grpcio dependency. See Cargo.toml
+
+## Compiling the protos, and importing proto rust code
+The example `build.rs` is used to compile the protos.
+In our Cargo.toml, there are references for the proto-rust code as a library, and a mod.rs for import paths to use in cli.rs and server.rs.
+
+---
+
+First attempt I tried to configure diesel and protos at the same time, but it ended up being too complicated.
+
+Second attempt I got the gRPC communication working with the CLI, and then incorporating Diesel.
+
+Documenting setup:
+* Started postgres in docker
+* `diesel setup`
+* `diesel migration generate create_orders`
+* Looked at the OrderRecord proto type to write `up.sql`. I think I can just use integer types, and use grpc code to convert to the native types.
+* `diesel migration run` -- This generated `src/schema.rs`
+
+I tried to manually modify shipment.rs, but it was immediately regenerated. Considering disabling the automatic build.rs stuff so I can modify it after compilation.
+
+After more reading of the Diesel walkthrough, it appears that the proto structs may be unsuitable for Diesel. I fear that we will need to wrap some types around the protos. On the surface, that already sounds like a bit of double work.
+- Design the protos
+- Design the database tables
+- Generate the proto models
+- Wrap the proto models for Diesel #[derive()] annotations. Find out if I can just implement the traits? Hunch is no/not worth effort.
+- Have conversions to/from the proto models to use w/ Diesel.
+
+Is this maintainable? Going to say no.
+
+---
+
+Third attempt:
+
+Started out with moving the codebase to use Cargo Workspaces. This took a moment but it is now done.
+
+Diesel's getting started guide sets up an environment that requires a running database to infer the schema. This is a nice feature, but we don't want to use it. I commented out the contents of `diesel.toml`
+
+Additionally, as a way to keep the diesel and gRPC code reasonably separate, I made them their own crates and added them as additional workspaces. Build warnings suggesting I compile client and backend separately have disappeared, because I am no longer running the protobuf build during client and server compilation.
+
+> Good organization of these internal crates will go a long way to provide a pattern for adding new types of commands through the cli. New types that will care for the conversion to/from protobuf messages, and to/from the database.
+
+I found this Stack Overflow post that sought out to do what I wanted with mapping a custom type into the schema definition: https://stackoverflow.com/questions/49092437/how-do-i-implement-queryable-and-insertable-for-custom-field-types-in-diesel
+
+The [top post](https://stackoverflow.com/a/49097099) suggests implementing 2 traits: `ToSql` and `FromSql` and linked to the Diesel custom types test that shows a good model for implementing on a custom type.
+https://github.com/diesel-rs/diesel/blob/v1.3.1/diesel_tests/tests/custom_types.rs
+
+I went ahead and tried to adapt my database schema to the custom types model, and verified that I was able to insert on `cargo run`. Seemed to be working.
+
+(BTW, I found this helpful mapping of Diesel to Postgres type conversions https://kotiri.com/2018/01/31/postgresql-diesel-rust-types.html.)
+
+Now I was ready to adapt gRPC client/server code. Since I was a little unsure of what the end result would look like, I approached by playing with the proto types on the client-side. I would create the proto message type, populate it with data, and make the grpc service call. On the backend, I would create a new instance of my custom type, and directly convert the message data to use my custom enums.
+
+The way I solved this problem was to create a rust type that mirrors the generated type, but only w/ the message fields and not the special fields. (It was because of these fields that I opted to not try and force Diesel to directly use the protobuf structs.)
+
+What was left was the conversion between this my custom message type, and the proto message type. I implemented the `From` trait the proto type to custom type, and custom type to prototype. This is a nice compartmentalized area to map the enum types. On the backend side, I would still need to build a database query from my message, but since our my custom message can easily convert from proto to using common custom types with Diesel, it allows the code to be a lot cleaner. We have type safety from our client request, all the way to the db query.
