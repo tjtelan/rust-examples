@@ -1,8 +1,8 @@
 #[macro_use]
 extern crate diesel;
-extern crate diesel_derive_enum;
 extern crate dotenv;
 
 pub mod client;
+pub mod convert;
 pub mod schema;
 pub mod orders;

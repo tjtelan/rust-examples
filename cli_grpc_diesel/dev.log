@@ -1,52 +1,3 @@
-In this example, we want to demonstrate the interactions between Protobufs and Diesel.
-
-The aim is to utilize protoc generated data structures, and carry that representation from a client over grpc to a backend and into the database through Diesel.
-
-
-```
-cargo install diesel_cli --features postgres
-cargo install diesel_cli_ext
-```
-
-The example command line tool uses proto models on client and server-side.
-The story:
-The client side has an oil ordering tool.
-(Oil, bc get it...? protobufs + diesel, har har...)
-
-We'll have 2 initial actions:
-* Order a user-specified quantity, and a user-specified product of oil to a refinery
-  * For the sake of this narrative, oil for these jobs is going to be magical, and infinite. For the purposes of having a regular shaped object to add into the DB.
-* Look at status of an order
-  * In a high-level summary
-    * List the shipments, and time of order
-  * In a per-shipment detail
-    * Show a report of the single order
-
-We want to highlight the following interactions:
-* Getting user input from the command line, and marshalling into a protobuf derived type (I'm calling this "proto-native").
-* Connecting to a backend grpc server, and sending/recieving proto-native data 
-* Receiving data from the client, and marshalling into a proto-native type
-* Reading/Writing native types into the database
-
-# Build
-
-## w/ TLS support (Most likely the version you want)
-The version of pingcap's grpc library that compiles w/ TLS support is only in their github repo at the time of writing.
-```
-git clone https://github.com/pingcap/grpc-rs.git
-cd grpc-rs
-git submodule update --init --recursive
-```
-
-## w/o TLS support
-You need to switch the reference to the grpcio dependency. See Cargo.toml
-
-## Compiling the protos, and importing proto rust code
-The example `build.rs` is used to compile the protos.
-In our Cargo.toml, there are references for the proto-rust code as a library, and a mod.rs for import paths to use in cli.rs and server.rs.
-
----
-
 First attempt I tried to configure diesel and protos at the same time, but it ended up being too complicated.
 
 Second attempt I got the gRPC communication working with the CLI, and then incorporating Diesel.
@@ -95,3 +46,58 @@ Now I was ready to adapt gRPC client/server code. Since I was a little unsure of
 The way I solved this problem was to create a rust type that mirrors the generated type, but only w/ the message fields and not the special fields. (It was because of these fields that I opted to not try and force Diesel to directly use the protobuf structs.)
 
 What was left was the conversion between this my custom message type, and the proto message type. I implemented the `From` trait the proto type to custom type, and custom type to prototype. This is a nice compartmentalized area to map the enum types. On the backend side, I would still need to build a database query from my message, but since our my custom message can easily convert from proto to using common custom types with Diesel, it allows the code to be a lot cleaner. We have type safety from our client request, all the way to the db query.
+
+This seems like a workable, scalable pattern.
+
+client/
+├── Cargo.toml
+└── src
+    ├── cli.yaml
+    └── client.rs
+
+This is the client-side command line. Simple cli to handle user input. We translate user input into the proper protobuf message structs, and make the unary rpc calls to the backend.
+
+backend/
+├── Cargo.toml
+└── src
+    ├── backend.rs
+    └── backend.yaml
+
+This is the server-side. Starts a gRPC server. We implement the RegistryService trait to handle the service endpoints. We translate incoming protobuf messages into our custom types, and translate back into protobuf when we sink the response to the client.
+
+migrations/
+├── 00000000000000_diesel_initial_setup
+│   ├── down.sql
+│   └── up.sql
+└── 2019-03-18-213310_create_orders
+    ├── down.sql
+    └── up.sql
+
+This directory was created with the `diesel` cli. The create_orders directory contains our starting point for the database, including custom Postgres enum types.
+
+models/
+├── Cargo.toml
+├── client.rs
+├── convert.rs
+├── mod.rs
+├── orders.rs
+└── schema.rs
+
+Models is a little complicated, since we're trying to take care of all of the fussy type switching within this crate for gRPC and Diesel usage.
+* Schema is where we define our database schema w/ our custom rust types. In order to leverage Diesel's ability to convert to/from our Rust types and Postgres' types, we implement the ToSql and FromSql traits (for our rust enum), and leverage those traits to derive SqlType on Diesel's handler struct.
+* Orders is where we keep Rust types that primarily were modeled for using w/ Diesel and our database.
+* Convert contains the impl of the `From` traits for our Diesel Rust types, and our gRPC Rust types.
+* Client is where helper functions for working with our models are implemented. Database operations are performed here
+
+protos/
+├── Cargo.toml
+├── build.rs
+├── mod.rs
+├── refinery.proto
+├── refinery.rs
+└── refinery_grpc.rs
+
+* build.rs is defines what protos we are building (refinery.proto), and when to build them.
+* refinery.proto is the file we author for build.rs
+* refinery_grpc.rs contains the generated boilerplate for the Service from refinery.proto. It generates a trait definition we implement in the backend crate, and other boilerplate for creating and starting the gRPC server.
+* refinery.rs has all of the generated Rust code for protobuf message serialization, and struct CRUD operations that correspond to the protobuf message fields. Because the generated code contains extra elements that is needed for the gRPC generated traits, we are unable to reuse the generated code outside of the intended domain of serialization/deserialization for gRPC.

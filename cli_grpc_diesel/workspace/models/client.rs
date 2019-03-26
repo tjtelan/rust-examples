@@ -54,10 +54,15 @@ pub fn order_received_success() -> refinery::OrderStatus {
     order_status
 }
 
+// db_query_to_proto is used by the backend to convert a Vector of Order (from a Diesel select
+// query) into the proto native OrderRecordList. Implementing `From` for a Vector would have taken
+// longer, and used a wrapper type. That very well may be the more maintainable approach, but this
+// was quicker...
 pub fn db_query_to_proto(rust_record : Vec<Order>) -> refinery::OrderRecordList {
 
     let mut proto_vec : Vec<refinery::OrderRecord> = Vec::new();
 
+    // Let's take advantage of the `From` trait
     for r in rust_record {
         proto_vec.push(refinery::OrderRecord::from(r));
     }
@@ -67,7 +72,6 @@ pub fn db_query_to_proto(rust_record : Vec<Order>) -> refinery::OrderRecordList 
     let mut proto_final = refinery::OrderRecordList::new();
     proto_final.set_order(proto_order);
     proto_final
-
 }
 
 impl OrderForm {
