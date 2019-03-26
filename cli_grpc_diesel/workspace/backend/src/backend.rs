@@ -21,9 +21,9 @@ use protos::refinery_grpc::{self, Refinery}; // `self` is *probably* for ::creat
 #[derive(Clone)]
 struct RefineryService;
 
-//// We're going to implement the Refinery trait on our own struct.
-//// These are the methods used by the client.
 impl Refinery for RefineryService {
+    // The client-side converts to refinery::OrderForm while calling this endpoint.
+    // But we convert the proto type back to our custom type right before adding to the database
     fn order(&mut self, ctx: RpcContext, req: refinery::OrderForm, sink: UnarySink<refinery::OrderStatus>) {
 
         println!("Received an order: {:?}", req);
@@ -44,34 +44,29 @@ impl Refinery for RefineryService {
 
         ctx.spawn(f)
     }
-}
 
-//    fn status(&mut self, ctx: RpcContext, req: OrderID, sink: UnarySink<OrderRecord>) {
-//        println!("Request for status on order ID: {:?}", req);
-//
-//        // Here's where a DB query would happen to return any existing records.
-//
-//        // Building the record manually for now
-//        let mut order_record = OrderRecord::new();
-//
-//        // We could probably just choose random values as demonstration
-//        let mut order_form = OrderForm::new();
-//        order_form.set_quantity(99);
-//        order_form.set_product(OilProductType::LUBRICANT);
-//
-//        // Attach to the record we are returning
-//        order_record.set_id(req);
-//        order_record.set_order(order_form);
-//
-//        // ???: Map successful result on the Sink
-//        let f = sink
-//            .success(order_record.clone())
-//            .map(move |_| println!("Status: {{ {:?} }}", order_record))
-//            .map_err(move |err| eprintln!("Failed to reply: {:?}", err));
-//
-//        ctx.spawn(f)
-//    }
-//}
+    fn get_all_records(&mut self, ctx: RpcContext, _req: protos::empty::Empty, sink: UnarySink<refinery::OrderRecordList>){
+        println!("Received request for all of the order records");
+
+        // FIXME: Instead, can I connect to db before registering this service? Is that thread-safe?
+        let conn = client::establish_connection();
+
+        // Call out to db
+        let query_results = client::get_all_orders(&conn);
+
+        // FIXME: This conversion pattern is different than the plain `From` traits, because we
+        // have to handle the outer vector in a special way. 
+        let parsed_query_proto = client::db_query_to_proto(query_results);
+        //println!("Got results from the database: {:?}", query_results);
+
+        let f = sink
+            .success(parsed_query_proto.clone())
+            .map(move |_| println!("Responded with list of records {{ {:?} }}", parsed_query_proto))
+            .map_err(move |err| eprintln!("Failed to reply: {:?}", err));
+
+        ctx.spawn(f)
+    }
+}
 
 fn main() {
 

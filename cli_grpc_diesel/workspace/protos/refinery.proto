@@ -2,11 +2,11 @@ syntax = "proto3";
 package refinery;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 
 service Refinery {
-  //rpc Status(OrderID) returns (OrderRecord);
   rpc Order(OrderForm) returns (OrderStatus);
-  //rpc GetAllRecords() returns (OrderRecordList);
+  rpc GetAllRecords(google.protobuf.Empty) returns (OrderRecordList);
 }
 
 // From chart on wikipedia - top US oil products
@@ -21,8 +21,8 @@ enum OilProductType {
 }
 
 message OrderForm {
-  int32 quantity = 2;
-  OilProductType product = 3;
+  int32 quantity = 1;
+  OilProductType product = 2;
 }
 
 enum OrderResponseType {
@@ -35,16 +35,21 @@ message OrderStatus {
   OrderResponseType status = 1;
 }
 
-//message OrderID {
+// The following are only for queries
+//message OrderQuery {
 //  int32 id = 1;
+//  OilProductType product = 2;
+//  google.protobuf.Timestamp before_time = 3;
+//  google.protobuf.Timestamp after_time = 4;
 //}
 
-//message OrderRecord {
-//  OrderID id = 1;
-//  OrderForm order = 2;
-//  google.protobuf.Timestamp received_time = 3;
-//}
+message OrderRecord {
+  int32 id = 1;
+  int32 quantity = 2;
+  OilProductType product = 3;
+  google.protobuf.Timestamp received_time = 4;
+}
 
-//message OrderRecordList {
-//  OrderRecord order = 1;
-//}
+message OrderRecordList {
+  repeated OrderRecord order = 1;
+}

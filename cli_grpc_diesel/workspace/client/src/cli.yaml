@@ -9,13 +9,8 @@ args:
       long: "debug"
 
 subcommands:
-  - status:
-      about: Get the status about a specific order
-      args:
-        - orderid:
-            help: ID of order you want status
-            index: 1
-            required: true
+  - summary:
+      about: Get all orders
   - order:
       about: Send a shipment order to the refinery
       args:
@@ -24,6 +19,6 @@ subcommands:
             index: 1
             required: true
         - product:
-            help: The product to be produced by the oil
+            help: "Options: gasoline,jetfuel,diesel,asphalt,heavy,lubricant,other"
             index: 2
             required: true

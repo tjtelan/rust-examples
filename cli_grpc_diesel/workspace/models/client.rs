@@ -18,14 +18,15 @@ pub fn establish_connection() -> PgConnection {
         .expect(&format!("Error connecting to {}", database_url))
 }
 
+// create_order is used by the backend. This is one of the test cases for converting the proto type
+// into custom type with From/Into traits whenever we need to use it.
 pub fn create_order(conn : &PgConnection, order_form : OrderForm) -> Order {
-    let timestamp = NaiveDateTime::from_timestamp(Utc::now().timestamp(),0);
 
     let new_order = vec![
         NewOrder {
             quantity : order_form.quantity,
             product_type : order_form.product_type,
-            received_time : timestamp,
+            received_time : NaiveDateTime::from_timestamp(Utc::now().timestamp(),0),
         },
     ];
 
@@ -35,10 +36,38 @@ pub fn create_order(conn : &PgConnection, order_form : OrderForm) -> Order {
         .expect("Error saving new order")
 }
 
+// get_all_orders is used by the backend
+pub fn get_all_orders(conn : &PgConnection) -> Vec<Order> {
+
+    let query : Vec<Order> = orders::table.select(orders::all_columns)
+        .order_by(orders::id)
+        .load(conn)
+        .expect("Error getting all order records");
+
+    query
+}
+
+// order_received_success is used by the backend. The proto typed result is returned to the caller
 pub fn order_received_success() -> refinery::OrderStatus {
     let mut order_status = refinery::OrderStatus::new();
     order_status.set_status(refinery::OrderResponseType::RECEIVED);
     order_status
+}
+
+pub fn db_query_to_proto(rust_record : Vec<Order>) -> refinery::OrderRecordList {
+
+    let mut proto_vec : Vec<refinery::OrderRecord> = Vec::new();
+
+    for r in rust_record {
+        proto_vec.push(refinery::OrderRecord::from(r));
+    }
+
+    let proto_order = protobuf::RepeatedField::from_vec(proto_vec);
+
+    let mut proto_final = refinery::OrderRecordList::new();
+    proto_final.set_order(proto_order);
+    proto_final
+
 }
 
 impl OrderForm {
@@ -48,6 +77,7 @@ impl OrderForm {
         println!("# of barrels to ship to refinery: {:?}", quantity);
 
         // Convert product to enum
+        // <String>.as_ref() used bc the left-hand side is &str
         let product_type_parsed = match product_type.as_ref() {
             "gasoline"  => OilProductEnum::GASOLINE,
             "jetfuel"   => OilProductEnum::JETFUEL,

@@ -3,7 +3,7 @@ use chrono::NaiveDateTime;
 
 use protos::refinery;
 
-#[derive(Queryable, Identifiable)]
+#[derive(Queryable, Identifiable, Debug, PartialEq)]
 pub struct Order {
     pub id: i32,
     pub quantity: i32,
@@ -25,10 +25,17 @@ pub struct OrderForm {
     pub product_type : OilProductEnum,
 }
 
-// Convert from the protos to our type
-impl From<refinery::OrderForm> for OrderForm {
-    fn from(proto_form : refinery::OrderForm) -> Self {
-        let product_parsed = match proto_form.get_product() {
+// This struct is used on the client-side
+//pub struct OrderQuery {
+//    pub id : Option<i32>,
+//    pub product_type : Option<OilProductEnum>,
+//    pub before_time: Option<NaiveDateTime>,
+//    pub after_time: Option<NaiveDateTime>,
+//}
+
+impl From<refinery::OilProductType> for OilProductEnum {
+    fn from(proto_form : refinery::OilProductType) -> Self {
+        match proto_form {
             refinery::OilProductType::GASOLINE  => OilProductEnum::GASOLINE,
             refinery::OilProductType::JETFUEL   => OilProductEnum::JETFUEL,
             refinery::OilProductType::DIESEL    => OilProductEnum::DIESEL,
@@ -36,19 +43,13 @@ impl From<refinery::OrderForm> for OrderForm {
             refinery::OilProductType::HEAVY     => OilProductEnum::HEAVY,
             refinery::OilProductType::LUBRICANT => OilProductEnum::LUBRICANT,
             refinery::OilProductType::OTHER     => OilProductEnum::OTHER,
-        };
- 
-        OrderForm {
-            quantity : proto_form.get_quantity(),
-            product_type : product_parsed,
         }
     }
 }
 
-// Convert from our type to the proto
-impl From<OrderForm> for refinery::OrderForm {
-    fn from(rust_form : OrderForm) -> Self {
-        let product_parsed = match rust_form.product_type {
+impl From<OilProductEnum> for refinery::OilProductType {
+    fn from(rust_form : OilProductEnum) -> Self {
+        match rust_form {
             OilProductEnum::GASOLINE  => refinery::OilProductType::GASOLINE,
             OilProductEnum::JETFUEL   => refinery::OilProductType::JETFUEL,
             OilProductEnum::DIESEL    => refinery::OilProductType::DIESEL,
@@ -56,13 +57,58 @@ impl From<OrderForm> for refinery::OrderForm {
             OilProductEnum::HEAVY     => refinery::OilProductType::HEAVY,
             OilProductEnum::LUBRICANT => refinery::OilProductType::LUBRICANT,
             OilProductEnum::OTHER     => refinery::OilProductType::OTHER,
-        };
+        }
+    }
+}
 
+// Convert from the protos to our type
+impl From<refinery::OrderForm> for OrderForm {
+    fn from(proto_form : refinery::OrderForm) -> Self {
+        OrderForm {
+            quantity : proto_form.get_quantity(),
+            product_type : OilProductEnum::from(proto_form.get_product()),
+        }
+    }
+}
+
+// Convert from our type to the proto
+impl From<OrderForm> for refinery::OrderForm {
+    fn from(rust_form : OrderForm) -> Self {
         let mut order = refinery::OrderForm::new();
-        order.set_quantity(rust_form.quantity);
-        order.set_product(product_parsed);
 
+        order.set_quantity(rust_form.quantity);
+        order.set_product(refinery::OilProductType::from(rust_form.product_type));
         order
+
+    }
+}
+
+// Convert for passing query results to client
+impl From<Order> for refinery::OrderRecord {
+    fn from(rust_form : Order) -> Self {
+        let mut proto_timestamp = protobuf::well_known_types::Timestamp::new();
+        proto_timestamp.set_seconds(rust_form.received_time.timestamp());
+        proto_timestamp.set_nanos(rust_form.received_time.timestamp_nanos() as i32);
+
+        let mut proto_form = refinery::OrderRecord::new();
+        proto_form.set_id(rust_form.id);
+        proto_form.set_quantity(rust_form.quantity);
+        proto_form.set_product(refinery::OilProductType::from(rust_form.product_type));
+        proto_form.set_received_time(proto_timestamp);
+        proto_form
+    }
+}
+
+impl From<refinery::OrderRecord> for Order {
+    fn from(proto_form : refinery::OrderRecord) -> Self {
+        Order {
+            id : proto_form.get_id(),
+            quantity : proto_form.get_quantity(),
+            product_type : OilProductEnum::from(proto_form.get_product()),
+            received_time : NaiveDateTime::from_timestamp(
+                proto_form.get_received_time().get_seconds(),
+                proto_form.get_received_time().get_nanos() as u32),
+        }
 
     }
 }

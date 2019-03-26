@@ -7,6 +7,8 @@ table! {
     use diesel::sql_types::{Integer, Timestamp};
     use super::OilProductTypeDieselWrapper;
 
+    // Note to self: This will create a struct `orders` that we can import to pass to
+    // Diesel's `table_name` macro
     orders {
         id -> Integer,
         quantity -> Integer,

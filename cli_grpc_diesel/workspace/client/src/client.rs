@@ -29,18 +29,15 @@ fn main() {
 
     // Here's where we create our proto objects, after parsing cli input
 
-    //if let Some(matches) = matches.subcommand_matches("status") {
-    //    let id = matches.value_of("orderid").unwrap().parse::<i32>().expect("ID should be a number");
-    //    println!("Get logs for shipment number: {}", id);
+    if let Some(_matches) = matches.subcommand_matches("summary") {
 
-    //    let mut orderid = OrderID::new();
-    //    orderid.set_id(id);
+        let empty_payload = protos::empty::Empty::new();
 
-    //    // Send the gRPC message
-    //    let order_status = client.status(&orderid).expect("RPC Failed!");
+        // Send the gRPC message
+        let orders = client.get_all_records(&empty_payload).expect("RPC Failed!");
 
-    //    println!("Order status: {:?}", order_status);
-    //}
+        println!("Order status: {:?}", orders);
+    }
 
     if let Some(matches) = matches.subcommand_matches("order") {
 
