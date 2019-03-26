@@ -29,6 +29,9 @@ We want to highlight the following interactions:
 
 # Pre-Build
 
+
+
+
 ## w/ TLS support (Most likely the version you want)
 The version of pingcap's grpc library that compiles w/ TLS support is only in their github repo at the time of writing.
 ```
@@ -47,6 +50,9 @@ In our Cargo.toml, there are references for the proto-rust code as a library, an
 # The rough script
 
 ```
+# Install protobuf and all its other stuff on Macos
+brew install protobuf
+
 # Init grpc-rs
 git clone https://github.com/pingcap/grpc-rs.git
 pushd grpc-rs
@@ -58,10 +64,16 @@ docker-compose up -d
 
 pushd workspace
 
-# Client
+# Install the database schema
+diesel migration run
+
+# In 2 terminals:
+
+# Terminal 1: Backend
+cargo run --bin backend
+
+# Terminal 2: Client
 cargo run --bin client -- order 1 diesel
 cargo run --bin client -- summary
 
-# Backend
-cargo run --bin backend
 ```
