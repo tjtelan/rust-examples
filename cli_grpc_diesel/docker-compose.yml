@@ -1,0 +1,14 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:11-alpine
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=rust_user
+      - POSTGRES_PASSWORD=rust_password
+      - POSTGRES_DB=oil_app
+      - PGDATA=/postgres
+    volumes:
+      - ./docker-data:/postgres
