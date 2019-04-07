@@ -40,7 +40,7 @@ impl Refinery for RefineryService {
         // FIXME: Instead, can I connect to db before registering this service? Is that thread-safe?
         let conn = client::establish_connection();
         // Convert the received proto request into our native type
-        let _new_order = client::create_order(&conn, orders::OrderForm::from(req));
+        let _new_order = client::create_order(&conn, req.into());
 
         ctx.spawn(f)
     }

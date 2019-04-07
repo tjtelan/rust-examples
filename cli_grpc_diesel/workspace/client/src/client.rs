@@ -52,7 +52,7 @@ fn main() {
         let order = orders::OrderForm::new(quantity, product.to_string());
 
         //// Send the gRPC message. Convert our custom type to the proto form
-        let order_status = client.order(&refinery::OrderForm::from(order)).expect("RPC Failed!");
+        let order_status = client.order(&order.into()).expect("RPC Failed!");
 
         println!("Order status: {:?}", order_status);
     }
