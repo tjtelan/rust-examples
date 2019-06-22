@@ -35,9 +35,11 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
     // Convert the command from the config to pass into container
     let mut container_command_raw = String::new();
-    let mut emitter = YamlEmitter::new(&mut container_command_raw);
-    emitter.compact(true);
-    emitter.dump(&yaml_data[0]["command"]).unwrap();
+    {
+        let mut emitter = YamlEmitter::new(&mut container_command_raw);
+        emitter.compact(true);
+        emitter.dump(&yaml_data[0]["command"]).unwrap();
+    }
 
     println!(
         "command: {:?}",
