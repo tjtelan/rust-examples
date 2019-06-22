@@ -5,7 +5,6 @@ authors = ["T.J. Telan <t.telan@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-env_logger = "0.6.1"
 tokio = "0.1.16"
 url = "1.7.2"
 shiplift = "0.5"

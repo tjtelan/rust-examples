@@ -1,17 +1,18 @@
-use shiplift::{tty::StreamType, Docker, ExecContainerOptions, PullOptions, ContainerOptions, ContainerListOptions, builder::ContainerFilter};
+use shiplift::{
+    builder::ContainerFilter, tty::StreamType, ContainerListOptions, ContainerOptions, Docker,
+    ExecContainerOptions, PullOptions,
+};
 use std::env;
 use tokio;
 use tokio::prelude::{Future, Stream};
 
 use std::io::Read;
 
-use yaml_rust::{YamlLoader, YamlEmitter};
 use std::collections::HashMap;
+use yaml_rust::{YamlEmitter, YamlLoader};
 
 fn main() -> Result<(), Box<std::error::Error>> {
     let docker = Docker::new();
-
-    env_logger::init();
 
     let mut f = std::fs::File::open("config.yml")?;
     let mut file_data = String::new();
@@ -19,17 +20,17 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
     let yaml_data = YamlLoader::load_from_str(&file_data).unwrap();
 
-	// Pull image specified in config
+    // Pull image specified in config
     println!("Pulling image");
     let img = yaml_data[0]["image"].clone().into_string().unwrap();
     let img_pull = docker
-            .images()
-            .pull(&PullOptions::builder().image(img.clone()).build())
-            .for_each(|output| {
-                println!("{:?}", output);
-                Ok(())
-            })
-            .map_err(|e| eprintln!("Error: {}", e));
+        .images()
+        .pull(&PullOptions::builder().image(img.clone()).build())
+        .for_each(|output| {
+            println!("{:?}", output);
+            Ok(())
+        })
+        .map_err(|e| eprintln!("Error: {}", e));
     tokio::run(img_pull);
 
     // Convert the command from the config to pass into container
@@ -38,32 +39,39 @@ fn main() -> Result<(), Box<std::error::Error>> {
     emitter.compact(true);
     emitter.dump(&yaml_data[0]["command"]).unwrap();
 
-    println!("command: {:?}", &container_command_raw[4..]
-                                .split('\n')
-                                .map(|s| { &s[2..] } )
-                                .collect::<Vec<&str>>());
+    println!(
+        "command: {:?}",
+        &container_command_raw[4..]
+            .split('\n')
+            .map(|s| { &s[2..] })
+            .collect::<Vec<&str>>()
+    );
 
     let container_command = &container_command_raw[4..]
-                                .split('\n')
-                                .map(|s| { &s[2..] })
-                                .collect::<Vec<&str>>();
+        .split('\n')
+        .map(|s| &s[2..])
+        .collect::<Vec<&str>>();
 
-    // TODO: We are going to want to mount the docker socket, or some other method for connecting to docker
     let container_spec = ContainerOptions::builder(img.as_ref())
         //.auto_remove(true)
         //.name("test-container-name")
         .labels(&[("testkey", "testvalue")].iter().cloned().collect())
-        //.entrypoint("/bin/sh")
         .attach_stdout(true)
         .attach_stderr(true)
-        .cmd(vec!["/bin/sh", "-c", "sleep 2h"]) // 2 hour timeout
+        .cmd(vec!["/bin/sh", "-c", "sleep 1h"]) // 1 hour timeout
         .build();
 
     let new_container = docker
-            .containers()
-            .create(&container_spec)
-            .map(|info| { println!("{:?}", info); info } )
-            .map_err(|e| { eprintln!("Error: {}", e); e });
+        .containers()
+        .create(&container_spec)
+        .map(|info| {
+            println!("{:?}", info);
+            info
+        })
+        .map_err(|e| {
+            eprintln!("Error: {}", e);
+            e
+        });
 
     println!("Creating new container");
     let mut container_runtime = tokio::runtime::Runtime::new().expect("Unable to create a runtime");
@@ -78,14 +86,24 @@ fn main() -> Result<(), Box<std::error::Error>> {
         .containers()
         .get(&container_id)
         .start()
-        .map(|info| { println!("{:?}", info); info } )
+        .map(|info| {
+            println!("{:?}", info);
+            info
+        })
         .map_err(|e| eprintln!("Error: {}", e));
     tokio::run(start_container);
 
-    // https://github.com/softprops/shiplift/issues/155
+    // FYI: This might not work until https://github.com/softprops/shiplift/issues/155 is fixed
     println!("Executing commands in the container");
     let options = ExecContainerOptions::builder()
-        .cmd(["/bin/sh", "-c", &format!("/bin/sh -c '{}'", container_command.join(";")) ].to_vec())
+        .cmd(
+            [
+                "/bin/sh",
+                "-c",
+                &format!("/bin/sh -c '{}'", container_command.join(";")),
+            ]
+            .to_vec(),
+        )
         .env(vec!["VAR=value"])
         .attach_stdout(true)
         .attach_stderr(true)
@@ -94,11 +112,10 @@ fn main() -> Result<(), Box<std::error::Error>> {
     let exec_container = docker
         .containers()
         .get(&container_id)
-        //.start()
         .exec(&options)
         .for_each(|chunk| {
             match chunk.stream_type {
-                StreamType::StdOut => println!("Stdout: {}", chunk.as_string_lossy()),
+                StreamType::StdOut => print!("Stdout: {}", chunk.as_string_lossy()),
                 StreamType::StdErr => eprintln!("Stderr: {}", chunk.as_string_lossy()),
                 StreamType::StdIn => unreachable!(),
             }
@@ -110,9 +127,12 @@ fn main() -> Result<(), Box<std::error::Error>> {
 
     println!("Listing the containers made by this example");
     let container_list_opts = ContainerListOptions::builder()
-            .all()
-            .filter(vec!(ContainerFilter::Label("testkey".to_string(), "testvalue".to_string())))
-            .build();
+        .all()
+        .filter(vec![ContainerFilter::Label(
+            "testkey".to_string(),
+            "testvalue".to_string(),
+        )])
+        .build();
     let list_containers = docker
         .containers()
         .list(&container_list_opts)
@@ -121,11 +141,9 @@ fn main() -> Result<(), Box<std::error::Error>> {
                 println!("container -> {:#?}", c)
             }
         })
-        .map_err(|e| eprintln!("Error: {}", e));
+        .map_err(|e| println!("Error: {}", e));
 
-    //let _ = container_runtime.block_on(list_containers);
     tokio::run(list_containers);
-
 
     Ok(())
 }
