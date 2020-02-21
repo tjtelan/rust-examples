@@ -1,0 +1,55 @@
+syntax = "proto3";
+package refinery;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service Refinery {
+  rpc Order(OrderForm) returns (OrderStatus);
+  rpc GetAllRecords(google.protobuf.Empty) returns (OrderRecordList);
+}
+
+// From chart on wikipedia - top US oil products
+enum OilProductType {
+  GASOLINE = 0;
+  JETFUEL = 1;
+  DIESEL = 2;
+  ASPHALT = 3;
+  HEAVY = 4;
+  LUBRICANT = 5;
+  OTHER = 6;
+}
+
+message OrderForm {
+  int32 quantity = 1;
+  OilProductType product = 2;
+}
+
+enum OrderResponseType {
+  UNKNOWN  = 0;
+  RECEIVED = 1;
+  REJECTED = 2;
+}
+
+message OrderStatus {
+  OrderResponseType status = 1;
+}
+
+// The following are only for queries
+//message OrderQuery {
+//  int32 id = 1;
+//  OilProductType product = 2;
+//  google.protobuf.Timestamp before_time = 3;
+//  google.protobuf.Timestamp after_time = 4;
+//}
+
+message OrderRecord {
+  int32 id = 1;
+  int32 quantity = 2;
+  OilProductType product = 3;
+  google.protobuf.Timestamp received_time = 4;
+}
+
+message OrderRecordList {
+  repeated OrderRecord order = 1;
+}

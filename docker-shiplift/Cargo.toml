@@ -1,11 +1,11 @@
 [package]
-name = "docker-example"
+name = "docker-shiplift"
 version = "0.1.0"
 authors = ["T.J. Telan <t.telan@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-tokio = "0.1.16"
-url = "1.7.2"
-shiplift = "0.5"
+tokio = "0.1"
+url = "2.1"
+shiplift = "0.6"
 yaml-rust = "0.4"

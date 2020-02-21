@@ -24,14 +24,14 @@ fn connect_to_redis() -> Connection {
     client.get_connection().unwrap()
 }
 
-fn set_an_integer(redis_connection : &Connection, user_integer : isize) -> RedisResult<()> {
+fn set_an_integer(redis_connection : &mut Connection, user_integer : isize) -> RedisResult<()> {
     // connect to redis
     // throw away the result, just make sure it does not fail
     let _: () = redis_connection.set("my_key", user_integer)?;
     Ok(())
 }
 
-fn fetch_an_integer(redis_connection : &Connection) -> RedisResult<isize> {
+fn fetch_an_integer(redis_connection : &mut Connection) -> RedisResult<isize> {
     // read back the key and return it.  Because the return value
     // from the function is a result for integer this will automatically
     // convert into one.
@@ -42,7 +42,7 @@ fn main() {
     // Load env vars from .env file, if exists
     dotenv::dotenv();
 
-    let con = connect_to_redis();
-    set_an_integer(&con, 42);
-    println!("{:?}", fetch_an_integer(&con));
+    let mut con = connect_to_redis();
+    set_an_integer(&mut con, 42);
+    println!("{:?}", fetch_an_integer(&mut con));
 }

@@ -1,8 +1,6 @@
 extern crate dotenv;
 extern crate hashicorp_vault as vault;
 
-use std::env;
-
 fn main() {
     dotenv::dotenv().ok();
 

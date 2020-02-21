@@ -1,0 +1,17 @@
+[package]
+name = "backend-example"
+version = "0.1.0"
+authors = ["T.J. Telan <t.telan@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+clap = { version = "2.32.0", features = ["yaml"] }
+grpcio = { version = "0.5.0", path = "../../grpc-rs" }
+futures = "0.1"
+dotenv = "0.9.0"
+protos-example = { path = "../protos" }
+diesel-models-example = { path = "../models" }
+
+[[bin]]
+name = "backend"
+path = "src/backend.rs"

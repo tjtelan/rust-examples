@@ -1,0 +1,13 @@
+[workspace]
+
+members = [
+  "cli-clap",
+#  "cli_grpc_diesel",
+#  "consul",
+  "docker-shiplift",
+#  "grpc",
+  "nsq",
+#  "db-diesel-postgres",
+  "redis",
+  "vault",
+]

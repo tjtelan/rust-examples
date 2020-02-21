@@ -1,0 +1,14 @@
+name: oil-cli 
+version: "0.1"
+author: T.J. Telan <t.telan@gmail.com>
+about: Example server-side cli to demonstrate protobufs and diesel crate interactions
+
+args:
+  - debug:
+      help: "Turn on debugging"
+      long: "debug"
+  - dev-mode:
+      help: "Turn on functionality we only want during development. (Implies debugging)"
+subcommands:
+  create_order:
+  get_order:
