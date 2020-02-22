@@ -8,10 +8,14 @@ This repo is organized into Rust workspaces, but you may need to `cargo run` wit
 
 ## Description of example crates
 ### cli-clap
-This directly uses the `clap` crate using an external yaml to define the cli schema.
+This directly uses the [clap.rs](https://crates.io/crates/clap) crate using an external yaml to define the cli schema.
 
-### cli_grpc_diesel
-** Not currently compiling via workspace**
+### cli-clap-grpc-pingcap-db-diesel 
+This is the crate used in my blog post: [Using a database + gRPC with Rust](https://tjtelan.com/blog/using-a-database-grpc-with-rust/)
+
+This crate is excluded from the workspace build. See the [README.md](cli-clap-grpc-pingcap-db-diesel/README.md) and follow the manual steps to build. 
+
+It uses [clap.rs](https://crates.io/crates/clap) with its yaml schema feature, Pingcap's grpc library, and Diesel for postgresql support.
 
 ### consul
 ** Not currently compiling via workspace**
