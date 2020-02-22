@@ -21,7 +21,7 @@ futures = "0.1.16"
 protobuf = "~2"
 # If you want to disable TLS support uncomment this line and comment the reference to the ./grpc-rs directory
 #grpcio = { version = "0.4.3", default-features = false, features = [ "protobuf-codec" ] }
-grpcio = { version = "0.5.0", path = "./grpc-rs" }
+grpcio = { version = "0.5.0-alpha.5", path = "./grpc-rs" }
 
 [build-dependencies]
 protoc-grpcio = "1.0.1"

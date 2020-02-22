@@ -2,12 +2,15 @@
 
 members = [
   "cli-clap",
-#  "cli_grpc_diesel",
-#  "consul",
   "docker-shiplift",
-#  "grpc",
   "nsq",
-#  "db-diesel-postgres",
   "redis",
   "vault",
+]
+
+exclude = [
+  "cli_grpc_diesel",
+  "consul",
+  "db-diesel-postgres",
+  "grpc-pingcap",
 ]

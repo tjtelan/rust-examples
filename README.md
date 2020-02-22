@@ -22,8 +22,8 @@ This crate use a [docker-compose.yml](db-diesel-postgres/docker-compose.yml) to 
 ### docker-shiplift
 Uses `shiplift` and `yaml-rust` crates. Reads a yaml file with some configurable info for pulling images, creating, starting and execing commands into a container.
 
-### grpc
-** Not currently compiling via workspace**
+### grpc-pingcap
+This crate has a few external requirements (such as installing Golang) and manual steps for building the examples. See the crate's [README.md](grpc-pingcap/README.md)
 
 ### nsq
 This crate uses [docker-compose.yml](nsq/docker-compose.yml) to start an `nsq` container. There are two binaries, `nsq-producer` and `nsq-consumer` which uses `tokio-core` and `future` v0.1

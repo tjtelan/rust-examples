@@ -3,7 +3,7 @@
 
 // https://github.com/Manishearth/rust-clippy/issues/702
 #![allow(unknown_lints)]
-#![allow(clippy)]
+#![allow(clippy::all)]
 
 #![cfg_attr(rustfmt, rustfmt_skip)]
 
@@ -63,7 +63,7 @@ pub trait Diner {
 
 pub fn create_diner<S: Diner + Send + Clone + 'static>(s: S) -> ::grpcio::Service {
     let mut builder = ::grpcio::ServiceBuilder::new();
-    let mut instance = s.clone();
+    let mut instance = s;
     builder = builder.add_unary_handler(&METHOD_DINER_EAT, move |ctx, req, resp| {
         instance.eat(ctx, req, resp)
     });
