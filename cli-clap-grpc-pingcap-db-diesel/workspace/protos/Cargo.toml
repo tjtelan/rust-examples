@@ -1,0 +1,19 @@
+[package]
+name = "protos-example"
+version = "0.1.0"
+authors = ["T.J. Telan <t.telan@gmail.com>"]
+edition = "2018"
+build = "build.rs"
+
+[dependencies]
+futures = "0.1.16"
+grpcio = { version = "0.5.0-alpha.5", path = "../../grpc-rs" }
+protobuf = "~2"
+
+[lib]
+name = "protos"
+path = "mod.rs"
+
+# For build.rs
+[build-dependencies]
+protoc-grpcio = "1.1"

@@ -9,7 +9,7 @@ members = [
 ]
 
 exclude = [
-  "cli_grpc_diesel",
+  "cli-clap-grpc-pingcap-db-diesel",
   "consul",
   "db-diesel-postgres",
   "grpc-pingcap",

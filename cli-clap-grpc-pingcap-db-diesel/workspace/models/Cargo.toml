@@ -1,17 +1,18 @@
 [package]
-name = "backend-example"
+name = "diesel-models-example"
 version = "0.1.0"
 authors = ["T.J. Telan <t.telan@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-clap = { version = "2.33", features = ["yaml"] }
+futures = "0.1.16"
 grpcio = { version = "0.5.0-alpha.5", path = "../../grpc-rs" }
-futures = "0.3"
+protobuf = "~2"
+diesel = { version = "1.4", features = ["postgres", "chrono"] }
 dotenv = "0.15.0"
+chrono = "0.4"
 protos-example = { path = "../protos" }
-diesel-models-example = { path = "../models" }
 
-[[bin]]
-name = "backend"
-path = "src/backend.rs"
+[lib]
+name = "models"
+path = "mod.rs"
