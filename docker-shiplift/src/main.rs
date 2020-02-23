@@ -2,21 +2,18 @@ use shiplift::{
     builder::ContainerFilter, tty::StreamType, ContainerListOptions, ContainerOptions, Docker,
     ExecContainerOptions, PullOptions,
 };
-use std::env;
 use tokio;
 use tokio::prelude::{Future, Stream};
+use std::io::prelude::*;
 
-use std::io::Read;
-
-use std::collections::HashMap;
 use yaml_rust::{YamlEmitter, YamlLoader};
 
-fn main() -> Result<(), Box<std::error::Error>> {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let docker = Docker::new();
 
     let mut f = std::fs::File::open("config.yml")?;
     let mut file_data = String::new();
-    f.read_to_string(&mut file_data);
+    let _ = f.read_to_string(&mut file_data);
 
     let yaml_data = YamlLoader::load_from_str(&file_data).unwrap();
 

@@ -19,10 +19,10 @@ fn main() {
             .and_then(move |response| {
                 let ret = response.for_each(move |message| {
                     if message.message_id == "_heartbeat_" {
-                        conn.nop();
+                        let _ = conn.nop();
                     } else {
                         println!("Response {:?} {:?}", message.message_id, message.message_body);
-                        conn.fin(message.message_id); // Inform NSQ (Message consumed)
+                        //conn.fin(message.message_id); // Inform NSQ (Message consumed)
                     }
                     Ok(())
                 });
