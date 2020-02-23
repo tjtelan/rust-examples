@@ -22,7 +22,7 @@ fn main() {
                         let _ = conn.nop();
                     } else {
                         println!("Response {:?} {:?}", message.message_id, message.message_body);
-                        //conn.fin(message.message_id); // Inform NSQ (Message consumed)
+                        let _ = conn.fin(message.message_id); // Inform NSQ (Message consumed)
                     }
                     Ok(())
                 });
