@@ -1,5 +1,4 @@
-use std::process::Command;
-use std::str;
+use std::process::{Command, Stdio};
 use tonic::{transport::Server, Request, Response, Status};
 
 // Import the generated rust code into module
@@ -22,11 +21,21 @@ impl RemoteCli for Cli {
         &self,
         request: Request<CommandInput>,
     ) -> Result<Response<CommandOutput>, Status> {
-        let mut command = Command::new(&request.into_inner().command);
+        let req_command = request.into_inner();
+        let args = req_command.clone().args;
+        let command = Command::new(&req_command.clone().command)
+            .args(args)
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("failed to execute child process");
+
+        let output = command
+            .wait_with_output()
+            .expect("failed to wait on child process");
+        let output = output.stdout;
 
         Ok(Response::new(CommandOutput {
-            output: String::from_utf8(command.output().expect("failed to execute process").stdout)
-                .unwrap(),
+            output: String::from_utf8(output).unwrap(),
         }))
     }
 }
