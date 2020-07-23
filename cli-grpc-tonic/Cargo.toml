@@ -1,0 +1,18 @@
+[package]
+name = "cli-grpc-tonic"
+version = "0.1.0"
+authors = ["T.J. Telan <t.telan@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+# gRPC server
+tonic = "0.3.0"
+prost = "0.6"
+# CLI
+structopt = "0.3"
+# Async runtime - Remove unneeded features before posting
+tokio = { version = "0.2", features = ["rt-threaded", "time", "stream", "fs", "macros", "uds"] }
+
+[build-dependencies]
+# protobuf->Rust compiler
+tonic-build = "0.3.0"

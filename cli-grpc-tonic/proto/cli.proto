@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package remotecli;
+
+// Command input
+message CommandInput {
+  string command = 1;
+}
+
+// Command output
+message CommandOutput {
+  string output = 1;
+}
+
+// Service definition
+service RemoteCLI {
+  rpc Shell(CommandInput) returns (CommandOutput);
+}

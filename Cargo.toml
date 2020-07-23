@@ -6,6 +6,7 @@ members = [
   "nsq",
   "redis",
   "vault",
+  "cli-grpc-tonic"
 ]
 
 exclude = [
