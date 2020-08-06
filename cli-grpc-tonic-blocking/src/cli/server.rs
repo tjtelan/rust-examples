@@ -12,6 +12,7 @@ use remotecli::remote_cli_server::{RemoteCli, RemoteCliServer};
 // Proto message structs
 use remotecli::{CommandInput, CommandOutput};
 
+use crate::ServerOptions;
 #[derive(Default)]
 pub struct Cli {}
 
@@ -22,8 +23,12 @@ impl RemoteCli for Cli {
         request: Request<CommandInput>,
     ) -> Result<Response<CommandOutput>, Status> {
         let req_command = request.into_inner();
-        let args = req_command.clone().args;
-        let command = Command::new(&req_command.clone().command)
+        let command = &req_command.clone().command;
+        let args = &req_command.clone().args;
+
+        println!("Running command: {:?} - args: {:?}", &command, &args);
+
+        let command = Command::new(&command)
             .args(args)
             .stdout(Stdio::piped())
             .spawn()
@@ -40,8 +45,8 @@ impl RemoteCli for Cli {
     }
 }
 
-pub async fn start_server() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "[::1]:50051".parse().unwrap();
+pub async fn start_server(opts: ServerOptions) -> Result<(), Box<dyn std::error::Error>> {
+    let addr = opts.server_listen_addr.parse().unwrap();
     let cli_server = Cli::default();
 
     println!("RemoteCliServer listening on {}", addr);

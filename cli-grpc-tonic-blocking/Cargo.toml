@@ -1,5 +1,5 @@
 [package]
-name = "cli-grpc-tonic"
+name = "cli-grpc-tonic-blocking"
 version = "0.1.0"
 authors = ["T.J. Telan <t.telan@gmail.com>"]
 edition = "2018"
@@ -10,8 +10,8 @@ tonic = "0.3.0"
 prost = "0.6"
 # CLI
 structopt = "0.3"
-# Async runtime - Remove unneeded features before posting
-tokio = { version = "0.2", features = ["rt-threaded", "time", "stream", "fs", "macros", "uds"] }
+# Async runtime
+tokio = { version = "0.2", features = ["full"] }
 
 [build-dependencies]
 # protobuf->Rust compiler

@@ -9,19 +9,16 @@ use remotecli::remote_cli_client::RemoteCliClient;
 // Proto message structs
 use remotecli::CommandInput;
 
-use crate::RemoteCommand;
+use crate::RemoteCommandOptions;
 
-pub async fn client_run(rc: RemoteCommand) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn client_run(rc_opts: RemoteCommandOptions) -> Result<(), Box<dyn std::error::Error>> {
     // Connect to server
     // Use server addr if given, otherwise use default
-    let mut client = match rc.target_addr {
-        Some(addr) => RemoteCliClient::connect(addr).await?,
-        None => RemoteCliClient::connect("http://[::1]:50051").await?,
-    };
+    let mut client = RemoteCliClient::connect(rc_opts.server_addr).await?;
 
     let request = tonic::Request::new(CommandInput {
-        command: rc.command[0].clone().into(),
-        args: rc.command[1..].to_vec(),
+        command: rc_opts.command[0].clone().into(),
+        args: rc_opts.command[1..].to_vec(),
     });
 
     let response = client.shell(request).await?;
