@@ -1,4 +1,4 @@
-pub mod cli;
+pub mod remotecli;
 
 use structopt::StructOpt;
 
@@ -45,12 +45,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match args.subcommand {
         SubCommand::StartServer(opts) => {
-            println!("Start the server");
-            cli::server::start_server(opts).await?;
+            println!("Start the server on: {:?}", opts.server_listen_addr);
+            remotecli::server::start_server(opts).await?;
         }
         SubCommand::Run(rc_opts) => {
             println!("Run command: '{:?}'", rc_opts.command);
-            cli::client::client_run(rc_opts).await?;
+            remotecli::client::client_run(rc_opts).await?;
         }
     }
 

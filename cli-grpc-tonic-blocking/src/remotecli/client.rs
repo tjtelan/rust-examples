@@ -1,13 +1,13 @@
 // Import the generated rust code into module
-pub mod remotecli {
+pub mod remotecli_proto {
     tonic::include_proto!("remotecli");
 }
 
-// Proto generated client traits
-use remotecli::remote_cli_client::RemoteCliClient;
+// Proto generated client
+use remotecli_proto::remote_cli_client::RemoteCliClient;
 
 // Proto message structs
-use remotecli::CommandInput;
+use remotecli_proto::CommandInput;
 
 use crate::RemoteCommandOptions;
 
