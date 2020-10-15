@@ -36,4 +36,4 @@ This crate uses [docker-compose.yml](nsq/docker-compose.yml) to start an `nsq` c
 This crate use a [docker-compose.yml](redis/docker-compose.yml) to start a redis server. Connects to redis server, sets a key and then fetches value 
 
 ### vault
-This crate use a [docker-compose.yml](vault/docker-compose.yml) to start a vault server. Uses my personal fork of `hashicorp_vault`, and tests out setting and getting key/value secrets.
+This crate use a [docker-compose.yml](vault/docker-compose.yml) to start a vault server, and tests out setting and getting key/value secrets.

@@ -5,6 +5,6 @@ authors = ["T.J. Telan <t.telan@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-#hashicorp_vault = "0.6.1" # This crate doesn't support Vault kv version 2
-hashicorp_vault = { git = "https://github.com/tjtelan/vault-rs.git" }
+hashicorp_vault = "^1.1" # This crate doesn't support Vault kv version 2
+#hashicorp_vault = { git = "https://github.com/tjtelan/vault-rs.git" }
 dotenv = "0.15.0"
