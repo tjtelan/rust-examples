@@ -6,7 +6,8 @@ members = [
   "nsq",
   "redis",
   "vault",
-  "cli-grpc-tonic-blocking"
+  "cli-grpc-tonic-blocking",
+  "proc-macro-attribute"
 ]
 
 exclude = [

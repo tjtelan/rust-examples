@@ -32,6 +32,9 @@ This crate has a few external requirements (such as installing Golang) and manua
 ### nsq
 This crate uses [docker-compose.yml](nsq/docker-compose.yml) to start an `nsq` container. There are two binaries, `nsq-producer` and `nsq-consumer` which uses `tokio-core` and `future` v0.1
 
+### proc-macro
+This crate has an implementation of an [attribute macro](https://doc.rust-lang.org/reference/procedural-macros.html#attribute-macros) using `syn` and `quote` and `proc-macro2`.
+
 ### redis
 This crate use a [docker-compose.yml](redis/docker-compose.yml) to start a redis server. Connects to redis server, sets a key and then fetches value 
 
